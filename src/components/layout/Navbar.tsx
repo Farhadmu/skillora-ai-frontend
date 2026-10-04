@@ -19,6 +19,7 @@ import {
   Code2,
   Cpu,
   BarChart3,
+  Award,
 } from 'lucide-react';
 import { getCurrentUser, clearAuthSession, setAuthSession, api } from '@/lib/api';
 
@@ -76,6 +77,7 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: Layers },
     { href: '/tutor', label: 'AI Tutor', icon: Bot },
+    { href: '/assessments', label: 'Exams & Certs', icon: Award },
     { href: '/skills', label: 'Skill Graph', icon: Cpu },
     { href: '/career', label: 'Career', icon: Compass },
     { href: '/roadmap', label: 'Roadmap', icon: Map },

@@ -15,6 +15,10 @@ import {
   ChevronRight,
   ShieldCheck,
   Flame,
+  Volume2,
+  VolumeX,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -30,6 +34,75 @@ export default function TutorPage() {
   const [mode, setMode] = useState<'teach' | 'practice' | 'explain' | 'challenge' | 'revision' | 'interview'>('teach');
   const [bloomsLevel, setBloomsLevel] = useState('Analyze');
   const [language, setLanguage] = useState<'en' | 'bn'>('en');
+
+  // Speech API States
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const speakMessage = (id: string, text: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (isSpeaking && speakingId === id) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setSpeakingId(null);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[*_#`]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = language === 'bn' ? 'bn-BD' : 'en-US';
+    utterance.rate = 1.0;
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setSpeakingId(null);
+    };
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setSpeakingId(null);
+    };
+    setIsSpeaking(true);
+    setSpeakingId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const toggleListening = () => {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech Recognition is supported in Chrome, Edge, and modern browsers.');
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = language === 'bn' ? 'bn-BD' : 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        setIsListening(false);
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsListening(true);
+    } catch (e) {
+      setIsListening(false);
+    }
+  };
 
   const [messages, setMessages] = useState<any[]>([
     {
@@ -228,12 +301,40 @@ To begin: When architecting a high-throughput microservices gateway, how would y
 
                   <div className="space-y-2 max-w-[85%]">
                     <div
-                      className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap ${
+                      className={`p-4 rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap relative group ${
                         m.sender === 'user'
                           ? 'bg-emerald-600 text-white rounded-tr-none'
                           : 'bg-[#0e1424] border border-[#192338] text-zinc-200 rounded-tl-none'
                       }`}
                     >
+                      {m.sender === 'tutor' && (
+                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#1b253b] text-[10px] text-zinc-400">
+                          <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
+                            <Bot className="w-3 h-3" /> Socratic AI Tutor
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => speakMessage(m.id, m.text)}
+                            className={`flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-semibold transition ${
+                              isSpeaking && speakingId === m.id
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 animate-pulse'
+                                : 'bg-[#131b2e] text-zinc-400 hover:text-white border-[#22304d]'
+                            }`}
+                          >
+                            {isSpeaking && speakingId === m.id ? (
+                              <>
+                                <VolumeX className="w-3 h-3 text-emerald-400" />
+                                <span>Stop Audio</span>
+                              </>
+                            ) : (
+                              <>
+                                <Volume2 className="w-3 h-3 text-cyan-400" />
+                                <span>Voice Playback</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
                       {m.text}
                     </div>
 
@@ -279,11 +380,27 @@ To begin: When architecting a high-throughput microservices gateway, how would y
             {/* Input Bar */}
             <div className="p-4 border-t border-[#1a2236] bg-[#070b13]">
               <form onSubmit={handleSend} className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  title="Voice Input (Speech-to-Text)"
+                  className={`p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center shrink-0 ${
+                    isListening
+                      ? 'bg-rose-500/20 border-rose-500/50 text-rose-400 animate-pulse ring-2 ring-rose-500/30'
+                      : 'bg-[#101726] border-[#1e293b] text-zinc-400 hover:text-white hover:border-zinc-700'
+                  }`}
+                >
+                  {isListening ? <MicOff className="w-4 h-4 text-rose-400" /> : <Mic className="w-4 h-4 text-cyan-400" />}
+                </button>
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Explain your approach, ask for a Socratic hint, or analyze trade-offs..."
+                  placeholder={
+                    isListening
+                      ? 'Listening to your voice... Speak now...'
+                      : 'Explain your approach, ask for a Socratic hint, or analyze trade-offs...'
+                  }
                   className="flex-1 bg-[#101726] border border-[#1e293b] rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
                 />
                 <button
