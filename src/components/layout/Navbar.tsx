@@ -20,6 +20,10 @@ import {
   Cpu,
   BarChart3,
   Award,
+  BookOpen,
+  Settings,
+  Users,
+  Terminal,
 } from 'lucide-react';
 import { getCurrentUser, clearAuthSession, setAuthSession, api } from '@/lib/api';
 
@@ -34,6 +38,7 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
   const [user, setUser] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -56,10 +61,10 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
       setUser(res.user);
 
       const routeMap = {
-        LEARNER: '/dashboard',
-        EDUCATOR: '/educator',
-        EMPLOYER: '/employer',
-        ADMIN: '/admin',
+        LEARNER: '/learner/dashboard',
+        EDUCATOR: '/educator/dashboard',
+        EMPLOYER: '/employer/dashboard',
+        ADMIN: '/admin/dashboard',
       };
       router.push(routeMap[role]);
     } catch (err) {
@@ -75,15 +80,22 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
   };
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard', icon: Layers },
-    { href: '/tutor', label: 'AI Tutor', icon: Bot },
-    { href: '/assessments', label: 'Exams & Certs', icon: Award },
-    { href: '/skills', label: 'Skill Graph', icon: Cpu },
-    { href: '/career', label: 'Career', icon: Compass },
-    { href: '/roadmap', label: 'Roadmap', icon: Map },
-    { href: '/projects', label: 'Projects & Code', icon: Code2 },
-    { href: '/interview', label: 'Readiness', icon: ShieldCheck },
-    { href: '/jobs', label: 'Talent Market', icon: Briefcase },
+    { href: '/learner/dashboard', label: 'Overview', icon: Layers },
+    { href: '/learner/career', label: 'Career', icon: Compass },
+    { href: '/learner/learn', label: 'Learn', icon: BookOpen },
+    { href: '/learner/skills', label: 'Skills', icon: Cpu },
+    { href: '/learner/assessments', label: 'Assessments', icon: Award },
+    { href: '/learner/projects', label: 'Projects', icon: Code2 },
+    { href: '/learner/interview', label: 'Interview', icon: ShieldCheck },
+    { href: '/learner/jobs', label: 'Jobs', icon: Briefcase },
+  ];
+
+  const moreLinks = [
+    { href: '/learner/portfolio', label: 'Portfolio', icon: User },
+    { href: '/learner/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/learner/coding', label: 'Coding Lab', icon: Terminal },
+    { href: '/learner/community', label: 'Community', icon: Users },
+    { href: '/learner/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -118,7 +130,9 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
               title="Click to quickly switch simulated test roles"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Role: <strong className="text-emerald-400">{user?.role || 'GUEST'}</strong></span>
+              <span>
+                Role: <strong className="text-emerald-400">{user?.role || 'GUEST'}</strong>
+              </span>
               <ChevronDown className="w-3 h-3 text-zinc-400" />
             </button>
 
@@ -146,16 +160,16 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
           </div>
         </div>
 
-        {/* Center Navigation Links */}
+        {/* Center Navigation Links (Learner 12 Domains) */}
         <nav className="hidden xl:flex items-center gap-1">
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname === link.href || (link.href === '/learner/dashboard' && pathname === '/dashboard');
             const Icon = link.icon;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all duration-200 ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all duration-200 ${
                   isActive
                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-[#111726]'
@@ -166,6 +180,41 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
               </Link>
             );
           })}
+
+          {/* More Menu Dropdown for Analytics, Coding Lab, Portfolio, Community, Settings */}
+          <div className="relative">
+            <button
+              onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-[#111726] flex items-center gap-1 transition"
+            >
+              <span>More</span>
+              <ChevronDown className="w-3 h-3" />
+            </button>
+
+            {moreMenuOpen && (
+              <div className="absolute right-0 mt-2 w-44 rounded-xl bg-[#0b0f19] border border-[#1e293b] shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                {moreLinks.map((item) => {
+                  const Icon = item.icon;
+                  const isItemActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMoreMenuOpen(false)}
+                      className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition ${
+                        isItemActive
+                          ? 'bg-emerald-500/15 text-emerald-400'
+                          : 'text-zinc-300 hover:bg-[#161f33] hover:text-white'
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Right Action Tools */}
@@ -219,24 +268,32 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
 
                   <div className="py-1">
                     <Link
-                      href="/dashboard"
+                      href="/learner/dashboard"
                       onClick={() => setDropdownOpen(false)}
                       className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-lg flex items-center gap-2 transition"
                     >
                       <Layers className="w-3.5 h-3.5 text-zinc-400" />
-                      Dashboard
+                      Command Center
                     </Link>
                     <Link
-                      href={`/portfolio/${user.id}`}
+                      href="/learner/profile"
                       onClick={() => setDropdownOpen(false)}
                       className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-lg flex items-center gap-2 transition"
                     >
                       <User className="w-3.5 h-3.5 text-zinc-400" />
-                      Public Portfolio
+                      Profile & Dossier
+                    </Link>
+                    <Link
+                      href="/learner/settings"
+                      onClick={() => setDropdownOpen(false)}
+                      className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-lg flex items-center gap-2 transition"
+                    >
+                      <Settings className="w-3.5 h-3.5 text-zinc-400" />
+                      Settings & Security
                     </Link>
                     {user.role === 'EDUCATOR' && (
                       <Link
-                        href="/educator"
+                        href="/educator/dashboard"
                         onClick={() => setDropdownOpen(false)}
                         className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-lg flex items-center gap-2 transition"
                       >
@@ -246,7 +303,7 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
                     )}
                     {user.role === 'EMPLOYER' && (
                       <Link
-                        href="/employer"
+                        href="/employer/dashboard"
                         onClick={() => setDropdownOpen(false)}
                         className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-lg flex items-center gap-2 transition"
                       >
@@ -256,7 +313,7 @@ export function Navbar({ onOpenCommandPalette, onOpenAiAssistant }: NavbarProps)
                     )}
                     {user.role === 'ADMIN' && (
                       <Link
-                        href="/admin"
+                        href="/admin/dashboard"
                         onClick={() => setDropdownOpen(false)}
                         className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-lg flex items-center gap-2 transition"
                       >

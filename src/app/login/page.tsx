@@ -13,6 +13,7 @@ import {
   Lock,
   Mail,
   AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
 import { api, setAuthSession } from '@/lib/api';
 
@@ -32,10 +33,10 @@ export default function LoginPage() {
       const res = await api.login({ email, password });
       setAuthSession(res.tokens.accessToken, res.user);
 
-      if (res.user.role === 'EDUCATOR') router.push('/educator');
-      else if (res.user.role === 'EMPLOYER') router.push('/employer');
-      else if (res.user.role === 'ADMIN') router.push('/admin');
-      else router.push('/dashboard');
+      if (res.user.role === 'EDUCATOR') router.push('/educator/dashboard');
+      else if (res.user.role === 'EMPLOYER') router.push('/employer/dashboard');
+      else if (res.user.role === 'ADMIN') router.push('/admin/dashboard');
+      else router.push('/learner/dashboard');
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {
@@ -62,7 +63,7 @@ export default function LoginPage() {
           <span className="font-extrabold text-2xl tracking-wider text-white">SKILLORA AI</span>
         </Link>
         <h2 className="text-xl font-bold text-white tracking-tight">Sign In to Platform Workspace</h2>
-        <p className="text-xs text-zinc-400 mt-1">Select a simulated persona or enter your credentials</p>
+        <p className="text-xs text-zinc-400 mt-1">Select a verified demo persona or enter your credentials</p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
@@ -76,13 +77,13 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => quickDemoSelect('learner@skillora.ai')}
-                className={`p-2 rounded-xl border text-left flex items-center gap-2 transition ${
+                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
                   email === 'learner@skillora.ai'
                     ? 'bg-emerald-500/15 border-emerald-500 text-emerald-400'
                     : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
                 }`}
               >
-                <Bot className="w-4 h-4 text-emerald-400" />
+                <Bot className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <div>
                   <div className="font-bold">Learner</div>
                   <div className="text-[10px] text-zinc-500">Farhadul</div>
@@ -92,13 +93,13 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => quickDemoSelect('educator@skillora.ai')}
-                className={`p-2 rounded-xl border text-left flex items-center gap-2 transition ${
+                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
                   email === 'educator@skillora.ai'
                     ? 'bg-cyan-500/15 border-cyan-500 text-cyan-400'
                     : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
                 }`}
               >
-                <GraduationCap className="w-4 h-4 text-cyan-400" />
+                <GraduationCap className="w-4 h-4 text-cyan-400 flex-shrink-0" />
                 <div>
                   <div className="font-bold">Educator</div>
                   <div className="text-[10px] text-zinc-500">Prof. Mitchell</div>
@@ -108,13 +109,13 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => quickDemoSelect('employer@skillora.ai')}
-                className={`p-2 rounded-xl border text-left flex items-center gap-2 transition ${
+                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
                   email === 'employer@skillora.ai'
                     ? 'bg-purple-500/15 border-purple-500 text-purple-400'
                     : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
                 }`}
               >
-                <Building2 className="w-4 h-4 text-purple-400" />
+                <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
                 <div>
                   <div className="font-bold">Employer</div>
                   <div className="text-[10px] text-zinc-500">TechScale AI</div>
@@ -124,13 +125,13 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => quickDemoSelect('admin@skillora.ai')}
-                className={`p-2 rounded-xl border text-left flex items-center gap-2 transition ${
+                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
                   email === 'admin@skillora.ai'
                     ? 'bg-emerald-500/15 border-emerald-500 text-emerald-400'
                     : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
                 }`}
               >
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <div>
                   <div className="font-bold">SuperAdmin</div>
                   <div className="text-[10px] text-zinc-500">Governance</div>
@@ -163,7 +164,15 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-zinc-300">Password</label>
+                <Link
+                  href="/forgot-password"
+                  className="text-[11px] text-emerald-400 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
                 <input
@@ -192,11 +201,19 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="text-center pt-2 border-t border-[#1a2236] text-xs text-zinc-400">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-emerald-400 font-semibold hover:underline">
-              Register New Profile
-            </Link>
+          <div className="pt-2 border-t border-[#1a2236] space-y-2 text-xs text-center text-zinc-400">
+            <div className="flex items-center justify-between">
+              <Link href="/resend-verification" className="text-zinc-400 hover:text-white transition flex items-center gap-1">
+                <HelpCircle className="w-3.5 h-3.5 text-zinc-500" />
+                <span>Verify email</span>
+              </Link>
+              <div>
+                Don&apos;t have an account?{' '}
+                <Link href="/register" className="text-emerald-400 font-semibold hover:underline">
+                  Register
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -58,6 +58,18 @@ export const api = {
     request<any>('/api/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   register: (data: any) =>
     request<any>('/api/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+  verifyEmail: (token: string) =>
+    request<any>('/api/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) }),
+  resendVerification: (email: string) =>
+    request<any>('/api/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
+  forgotPassword: (email: string) =>
+    request<any>('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (token: string, newPassword: string) =>
+    request<any>('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
+  changePassword: (data: { currentPassword: string; newPassword: string }) =>
+    request<any>('/api/auth/change-password', { method: 'POST', body: JSON.stringify(data) }),
+  logout: () => request<any>('/api/auth/logout', { method: 'POST' }),
+  logoutAll: () => request<any>('/api/auth/logout-all', { method: 'POST' }),
   getMe: () => request<any>('/api/auth/me'),
 
   // Profile & CV

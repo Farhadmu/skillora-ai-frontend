@@ -66,14 +66,23 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   if (!isOpen) return null;
 
   const defaultActions = [
-    { title: 'Open AI Teacher', icon: Bot, path: '/tutor', desc: 'Socratic dialogue & concept mastery' },
-    { title: 'Explore Skill Graph', icon: Cpu, path: '/skills', desc: 'Visual ontology & prerequisite maps' },
-    { title: 'Career Navigator', icon: Compass, path: '/career', desc: 'Target role comparison & JD Intelligence' },
-    { title: 'Reskilling Roadmap', icon: Map, path: '/roadmap', desc: 'Active milestone progression' },
-    { title: 'Review Code', icon: Code2, path: '/projects', desc: 'Automated AI code review & refactoring' },
-    { title: 'Mock Interview', icon: ShieldCheck, path: '/interview', desc: 'Simulated technical & system design' },
-    { title: 'Talent Marketplace', icon: Briefcase, path: '/jobs', desc: 'AI-matched verified job opportunities' },
-    { title: 'Learner Dashboard', icon: Layers, path: '/dashboard', desc: 'Readiness scores and next actions' },
+    { title: 'Learner Command Center', icon: Layers, path: '/learner/dashboard', desc: 'Readiness scores, today mission, and metrics' },
+    { title: 'AI Career Intelligence', icon: Compass, path: '/learner/career', desc: 'Target role comparison & JD Intelligence' },
+    { title: 'Learning Center & Modules', icon: Bot, path: '/learner/learn', desc: 'Knowledge hub, active lessons & flashcards' },
+    { title: 'Socratic AI Teacher', icon: Bot, path: '/learner/ai-teacher', desc: 'First-principles dialogue & concept mastery' },
+    { title: 'Visual Skill Graph & Gaps', icon: Cpu, path: '/learner/skills', desc: 'Visual ontology & prerequisite maps' },
+    { title: 'Adaptive Assessments', icon: ShieldCheck, path: '/learner/assessments', desc: 'Technical exams, MCQ, and certifications' },
+    { title: 'Projects Workspace & Review', icon: Code2, path: '/learner/projects', desc: 'Automated AI code review & refactoring' },
+    { title: 'Interactive Coding Lab', icon: Code2, path: '/learner/coding', desc: 'In-browser challenges & sandbox test suite' },
+    { title: 'AI Mock Interview', icon: ShieldCheck, path: '/learner/interview', desc: 'Simulated technical & system design' },
+    { title: 'Workforce Readiness Audit', icon: ShieldCheck, path: '/learner/readiness', desc: '7-D explainable readiness score breakdown' },
+    { title: 'Talent Marketplace & Matching', icon: Briefcase, path: '/learner/jobs', desc: 'AI-matched verified job opportunities' },
+    { title: 'Performance Analytics', icon: Layers, path: '/learner/analytics', desc: 'Skill growth velocity & weekly telemetry' },
+    { title: 'Community & Study Pods', icon: Layers, path: '/learner/community', desc: 'Peer discussions, study groups, hackathons' },
+    { title: 'Public Portfolio Manager', icon: Layers, path: '/learner/portfolio', desc: 'Verified credentials and public profile view' },
+    { title: 'Account Settings & Security', icon: Layers, path: '/learner/settings', desc: 'Active sessions, password change, AI settings' },
+    { title: 'Educator Cohort Console', icon: Layers, path: '/educator/dashboard', desc: 'Curriculum & cohort intervention analytics' },
+    { title: 'Employer Hiring Portal', icon: Briefcase, path: '/employer/dashboard', desc: 'Talent search, ATS pipeline & candidate matching' },
   ];
 
   const handleSelect = (path: string) => {
