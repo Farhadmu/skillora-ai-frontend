@@ -20,16 +20,10 @@ import {
   Mic,
   MicOff,
 } from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { CommandPalette } from '@/components/common/CommandPalette';
-import { AiAssistantDrawer } from '@/components/common/AiAssistantDrawer';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { api, getCurrentUser } from '@/lib/api';
 
 export default function TutorPage() {
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [assistantOpen, setAssistantOpen] = useState(false);
-
   const [subject, setSubject] = useState('Full-Stack Architecture');
   const [mode, setMode] = useState<'teach' | 'practice' | 'explain' | 'challenge' | 'revision' | 'interview'>('teach');
   const [bloomsLevel, setBloomsLevel] = useState('Analyze');
@@ -177,16 +171,8 @@ To begin: When architecting a high-throughput microservices gateway, how would y
   };
 
   return (
-    <div className="min-h-screen bg-[#06080d] text-zinc-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300">
-      <Navbar
-        onOpenCommandPalette={() => setPaletteOpen(true)}
-        onOpenAiAssistant={() => setAssistantOpen(true)}
-      />
-
-      <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
-      <AiAssistantDrawer isOpen={assistantOpen} onClose={() => setAssistantOpen(false)} />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <DashboardLayout role="LEARNER">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
         {/* ======================================================== */}
         {/* CONTROL DECK: SUBJECT, MODE, BLOOM'S, LANGUAGE */}
         {/* ======================================================== */}
@@ -534,8 +520,6 @@ To begin: When architecting a high-throughput microservices gateway, how would y
           </div>
         </div>
       )}
-
-      <Footer />
-    </div>
+    </DashboardLayout>
   );
 }

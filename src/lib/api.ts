@@ -168,12 +168,26 @@ export const api = {
 
   // Educator & Admin & Analytics
   getCohortOverview: () => request<any>('/api/educator/cohort'),
+  generateQuiz: (topic: string, count?: number) =>
+    request<any>('/api/educator/generate-quiz', {
+      method: 'POST',
+      body: JSON.stringify({ topic, count: count || 4 }),
+    }),
   getAdminStats: () => request<any>('/api/admin/stats'),
   getAdminUsers: () => request<any[]>('/api/admin/users'),
+  testAiCascade: () =>
+    request<any>('/api/admin/test-cascade', {
+      method: 'POST',
+    }),
   getLearnerAnalytics: () => request<any>('/api/analytics/learner'),
   getEmployerFunnel: () => request<any>('/api/analytics/employer/funnel'),
 
   // Global Search & Command Center
+  analyzeJd: (jdText: string) =>
+    request<any>('/api/career/analyze-jd', {
+      method: 'POST',
+      body: JSON.stringify({ jdText }),
+    }),
   globalSearch: (q: string) => request<any>(`/api/search?q=${encodeURIComponent(q)}`),
   askCommandCenter: (query: string, pageContext?: string) =>
     request<any>('/api/ai/command-center', {

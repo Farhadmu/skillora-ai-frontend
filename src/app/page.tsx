@@ -603,8 +603,8 @@ export default function LandingPage() {
                 a: 'Never. Skillora AI strictly adheres to Responsible AI standards: ranking algorithms evaluate verified competency, project evidence, and assessment scores without inferring or utilizing protected demographic characteristics.',
               },
               {
-                q: 'Can I try all user personas in this demo build?',
-                a: 'Yes! Use the role selector in the top navbar to instantly test the platform as a Learner, Educator, Employer, or SuperAdmin with one click.',
+                q: 'How do I access different role workspaces in Skillora?',
+                a: 'Sign in to your account with your credentials or register. Skillora automatically configures your dedicated workspace for Learners, Educators, Employers, or Platform Administrators.',
               },
             ].map((faq, idx) => (
               <div key={idx} className="p-4 rounded-xl bg-[#0b0f19] border border-[#1a2236]">
@@ -634,7 +634,7 @@ export default function LandingPage() {
                 href="/login"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-[#162035] hover:bg-[#1e2c49] text-white border border-[#23314f] transition"
               >
-                Switch Demo Persona
+                Sign In to Workspace
               </Link>
             </div>
           </div>

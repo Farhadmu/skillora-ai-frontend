@@ -17,15 +17,10 @@ import {
   Layers,
   ArrowRight,
 } from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { CommandPalette } from '@/components/common/CommandPalette';
-import { AiAssistantDrawer } from '@/components/common/AiAssistantDrawer';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { api, getCurrentUser } from '@/lib/api';
 
 export default function LearnerPortfolioPage() {
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [assistantOpen, setAssistantOpen] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [readiness, setReadiness] = useState<any>(null);
   const [isPublic, setIsPublic] = useState(true);
@@ -56,15 +51,8 @@ export default function LearnerPortfolioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#06080d] text-zinc-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300">
-      <Navbar
-        onOpenCommandPalette={() => setPaletteOpen(true)}
-        onOpenAiAssistant={() => setAssistantOpen(true)}
-      />
-      <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
-      <AiAssistantDrawer isOpen={assistantOpen} onClose={() => setAssistantOpen(false)} />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <DashboardLayout role="LEARNER">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header with Share & Visibility Controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#1a2236]">
           <div>
@@ -222,8 +210,6 @@ export default function LearnerPortfolioPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </div>
+    </DashboardLayout>
   );
 }
