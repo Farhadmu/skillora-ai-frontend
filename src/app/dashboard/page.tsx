@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Sparkles,
   ArrowRight,
@@ -28,6 +28,7 @@ import { api, getCurrentUser, setAuthSession } from '@/lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [profile, setProfile] = useState<any>(null);
   const [readiness, setReadiness] = useState<any>(null);
   const [roadmap, setRoadmap] = useState<any>(null);
@@ -38,26 +39,24 @@ export default function DashboardPage() {
   const [cvSuccess, setCvSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (currentUser?.role === 'EDUCATOR') {
-      router.replace('/educator/dashboard');
-      return;
-    }
-    if (currentUser?.role === 'EMPLOYER') {
-      router.replace('/employer/dashboard');
-      return;
-    }
-    if (currentUser?.role === 'ADMIN') {
-      router.replace('/admin/dashboard');
-      return;
-    }
-    if (currentUser?.role === 'LEARNER') {
-      router.replace('/learner/dashboard');
+    // ONLY perform role redirection when explicitly visiting the generic '/dashboard' root route
+    if (pathname === '/dashboard') {
+      const currentUser = getCurrentUser();
+      if (currentUser?.role === 'EDUCATOR') {
+        router.replace('/educator/dashboard');
+      } else if (currentUser?.role === 'EMPLOYER') {
+        router.replace('/employer/dashboard');
+      } else if (currentUser?.role === 'ADMIN') {
+        router.replace('/admin/dashboard');
+      } else {
+        router.replace('/learner/dashboard');
+      }
       return;
     }
 
+    // When already at /learner/dashboard or other explicit route, load data directly with zero redirection
     loadDashboardData();
-  }, [router]);
+  }, [pathname, router]);
 
   const loadDashboardData = async () => {
     try {
@@ -68,8 +67,7 @@ export default function DashboardPage() {
           password: 'Password123!',
         });
         setAuthSession(loginRes.tokens, loginRes.user);
-        router.replace('/learner/dashboard');
-        return;
+        user = loginRes.user;
       }
 
       const [profData, readData, roadData, jobsData] = await Promise.all([
@@ -122,7 +120,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout role="LEARNER">
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* ======================================================== */}
         {/* HEADER & RECOMMENDED NEXT ACTION */}
         {/* ======================================================== */}
@@ -182,7 +180,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <Link
-            href="/interview"
+            href="/learner/interview"
             className="px-5 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-black transition flex items-center gap-1.5 shadow-md flex-shrink-0"
           >
             <span>Start Mock Interview</span>
@@ -246,7 +244,7 @@ export default function DashboardPage() {
 
             <div className="pt-6 mt-6 border-t border-[#141b2b]">
               <Link
-                href="/interview"
+                href="/learner/interview"
                 className="text-xs font-bold text-emerald-400 hover:underline flex items-center justify-between"
               >
                 <span>Take Diagnostic Assessment</span>
@@ -333,7 +331,7 @@ export default function DashboardPage() {
 
             <div className="pt-4 mt-6 border-t border-[#141b2b] flex items-center justify-between text-xs">
               <span className="text-zinc-500">Milestones adapt dynamically as tasks are checked.</span>
-              <Link href="/roadmap" className="font-bold text-emerald-400 hover:underline flex items-center gap-1">
+              <Link href="/learner/learning/roadmap" className="font-bold text-emerald-400 hover:underline flex items-center gap-1">
                 <span>View Full Pathway</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -354,7 +352,7 @@ export default function DashboardPage() {
                   Verified Skill Graph Nodes ({profile?.skills?.length || 0})
                 </h3>
               </div>
-              <Link href="/skills" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">
+              <Link href="/learner/skills" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">
                 <span>Open Graph Engine</span>
                 <ArrowRight className="w-3 h-3" />
               </Link>
@@ -402,7 +400,7 @@ export default function DashboardPage() {
 
               <div className="space-y-2">
                 <Link
-                  href="/tutor"
+                  href="/learner/learning/ai-teacher"
                   className="p-3 rounded-xl bg-[#0e1424] hover:bg-[#161f33] border border-[#161f33] hover:border-emerald-500/40 transition flex items-center justify-between group"
                 >
                   <div>
@@ -415,7 +413,7 @@ export default function DashboardPage() {
                 </Link>
 
                 <Link
-                  href="/career"
+                  href="/learner/career"
                   className="p-3 rounded-xl bg-[#0e1424] hover:bg-[#161f33] border border-[#161f33] hover:border-cyan-500/40 transition flex items-center justify-between group"
                 >
                   <div>
@@ -428,7 +426,7 @@ export default function DashboardPage() {
                 </Link>
 
                 <Link
-                  href="/projects"
+                  href="/learner/build"
                   className="p-3 rounded-xl bg-[#0e1424] hover:bg-[#161f33] border border-[#161f33] hover:border-purple-500/40 transition flex items-center justify-between group"
                 >
                   <div>
@@ -441,7 +439,7 @@ export default function DashboardPage() {
                 </Link>
 
                 <Link
-                  href="/jobs"
+                  href="/learner/jobs"
                   className="p-3 rounded-xl bg-[#0e1424] hover:bg-[#161f33] border border-[#161f33] hover:border-emerald-500/40 transition flex items-center justify-between group"
                 >
                   <div>
@@ -472,7 +470,7 @@ export default function DashboardPage() {
                 Top Matched Positions For Your Verified Graph
               </h3>
             </div>
-            <Link href="/jobs" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">
+            <Link href="/learner/jobs" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">
               <span>View All Verified Roles</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
@@ -502,7 +500,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <Link
-                  href="/jobs"
+                  href="/learner/jobs"
                   className="w-full py-2 text-center rounded-lg bg-[#162035] hover:bg-emerald-500 hover:text-black font-semibold text-xs text-zinc-200 transition"
                 >
                   Inspect & Apply
@@ -511,7 +509,7 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
-      </main>
+      </div>
 
       {/* ======================================================== */}
       {/* AI CV PARSING MODAL */}
