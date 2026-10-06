@@ -137,23 +137,24 @@ export function DashboardSidebar({
       title: 'Cohort Operations',
       items: [
         { label: 'Cohort Console', href: '/educator/dashboard', icon: GraduationCap },
-        { label: 'Student Cohort Roster', href: '/educator#roster', icon: Users },
-        { label: 'Curriculum Mastery', href: '/educator#curriculum', icon: Layers },
+        { label: 'Student Cohort Roster', href: '/educator/learners', icon: Users },
+        { label: 'Curriculum & Teaching', href: '/educator/teaching', icon: Layers },
       ],
     },
     {
       title: 'AI Generation & Support',
       items: [
-        { label: 'AI Quiz Generator Studio', href: '/educator#quiz-generator', icon: Brain, badge: 'AI', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        { label: 'Early Interventions', href: '/educator#interventions', icon: Send, badge: 'Alerts', badgeColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
-        { label: 'Live Examination Catalog', href: '/assessments', icon: Award },
-        { label: 'Socratic Practice Lab', href: '/tutor', icon: Bot },
+        { label: 'AI Quiz Generator Studio', href: '/educator/assessments', icon: Brain, badge: 'AI', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        { label: 'AI Teaching Assistant', href: '/educator/ai', icon: Bot, badge: 'Copilot', badgeColor: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30' },
+        { label: 'Cohort Telemetry', href: '/educator/analytics', icon: BarChart3 },
+        { label: 'Examination Catalog', href: '/assessments', icon: Award },
       ],
     },
     {
       title: 'Institutional Settings',
       items: [
-        { label: 'Educator Settings', href: '/learner/settings', icon: Settings },
+        { label: 'Cohort Management', href: '/educator/cohorts', icon: Users },
+        { label: 'Educator Settings', href: '/educator/settings', icon: Settings },
       ],
     },
   ];
@@ -164,23 +165,23 @@ export function DashboardSidebar({
       title: 'Talent Acquisition ATS',
       items: [
         { label: 'ATS Command Center', href: '/employer/dashboard', icon: Building2 },
-        { label: 'Candidate Pipeline', href: '/employer#pipeline', icon: Users },
-        { label: 'Active Job Openings', href: '/employer#jobs', icon: Briefcase },
+        { label: 'Candidate Pipeline', href: '/employer/pipeline', icon: Users, badge: 'ATS', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        { label: 'Job Postings Studio', href: '/employer/jobs', icon: Briefcase },
       ],
     },
     {
       title: 'Fair Hiring & Verification',
       items: [
-        { label: 'Zero-Bias Anonymization', href: '/employer#anonymization', icon: ShieldCheck, badge: 'Protected', badgeColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-        { label: 'Technical Benchmarks', href: '/employer#benchmarks', icon: Award },
+        { label: 'Verified Talent Search', href: '/employer/talent', icon: ShieldCheck, badge: 'Zero-Bias', badgeColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
+        { label: 'Company Profile', href: '/employer/company', icon: Building2 },
+        { label: 'Hiring Funnel Analytics', href: '/employer/analytics', icon: TrendingUp },
         { label: 'Simulated Interviews', href: '/interview', icon: Play },
-        { label: 'Talent Sourcing Directory', href: '/jobs', icon: TrendingUp },
       ],
     },
     {
       title: 'Compliance & Account',
       items: [
-        { label: 'Company Settings', href: '/learner/settings', icon: Settings },
+        { label: 'Company Settings', href: '/employer/settings', icon: Settings },
       ],
     },
   ];
@@ -191,22 +192,22 @@ export function DashboardSidebar({
       title: 'Platform Governance',
       items: [
         { label: 'Governance Command Center', href: '/admin/dashboard', icon: ShieldAlert },
-        { label: 'Multi-Provider AI Cascade', href: '/admin#ai-cascade', icon: Cpu, badge: '8 Nodes', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        { label: 'RBAC User Management', href: '/admin#rbac', icon: UserCheck },
+        { label: 'Multi-Provider AI Cascade', href: '/admin/ai', icon: Cpu, badge: '8 Nodes', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
+        { label: 'RBAC User Management', href: '/admin/users', icon: UserCheck },
       ],
     },
     {
       title: 'Infrastructure & Ledger',
       items: [
-        { label: 'System Health & Telemetry', href: '/admin#telemetry', icon: Server },
-        { label: 'Audit Logs & Ledger', href: '/admin#audit', icon: Database },
+        { label: 'System Telemetry & Health', href: '/admin/analytics', icon: Server },
+        { label: 'Audit Logs & Ledger', href: '/admin/audit-logs', icon: Database },
         { label: 'Assessments Oversight', href: '/assessments', icon: Award },
       ],
     },
     {
       title: 'Platform System',
       items: [
-        { label: 'System Configuration', href: '/learner/settings', icon: Settings },
+        { label: 'System Configuration', href: '/admin/settings', icon: Settings },
       ],
     },
   ];

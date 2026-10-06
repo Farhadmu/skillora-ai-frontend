@@ -20,21 +20,48 @@ export class ApiError extends Error {
 
 export function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('skillora_access_token');
+  const token = localStorage.getItem('skillora_access_token');
+  if (!token || token === 'undefined' || token === 'null') return null;
+  return token;
 }
 
 export function getRefreshToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('skillora_refresh_token');
+  const token = localStorage.getItem('skillora_refresh_token');
+  if (!token || token === 'undefined' || token === 'null') return null;
+  return token;
 }
 
-export function setAuthSession(tokens: { accessToken: string; refreshToken?: string }, user: any) {
+export function setAuthSession(
+  tokensOrToken: { accessToken?: string; refreshToken?: string } | string,
+  userOrTokens?: any,
+  maybeRefreshToken?: string,
+) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('skillora_access_token', tokens.accessToken);
-  if (tokens.refreshToken) {
-    localStorage.setItem('skillora_refresh_token', tokens.refreshToken);
+
+  let accessToken = '';
+  let refreshToken = '';
+  let user: any = null;
+
+  if (typeof tokensOrToken === 'string') {
+    accessToken = tokensOrToken;
+    user = userOrTokens;
+    refreshToken = maybeRefreshToken || '';
+  } else if (tokensOrToken && typeof tokensOrToken === 'object') {
+    accessToken = tokensOrToken.accessToken || '';
+    refreshToken = tokensOrToken.refreshToken || '';
+    user = userOrTokens;
   }
-  localStorage.setItem('skillora_user', JSON.stringify(user));
+
+  if (accessToken && accessToken !== 'undefined' && accessToken !== 'null') {
+    localStorage.setItem('skillora_access_token', accessToken);
+  }
+  if (refreshToken && refreshToken !== 'undefined' && refreshToken !== 'null') {
+    localStorage.setItem('skillora_refresh_token', refreshToken);
+  }
+  if (user) {
+    localStorage.setItem('skillora_user', JSON.stringify(user));
+  }
 }
 
 export function clearAuthSession() {

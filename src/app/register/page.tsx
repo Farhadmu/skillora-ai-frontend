@@ -110,7 +110,7 @@ export default function RegisterPage() {
       const res = await api.register(payload);
       setRegistrationResult(res);
       if (res.tokens?.accessToken) {
-        setAuthSession(res.tokens.accessToken, res.user);
+        setAuthSession(res.tokens, res.user);
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please check your information and try again.');

@@ -301,7 +301,10 @@ export function WorkspaceSidebar() {
   }, [pathname, groups]);
 
   const toggleGroup = (title: string) => {
-    setOpenGroups((prev) => ({ ...prev, [title]: !prev[title] }));
+    setOpenGroups((prev) => ({
+      ...prev,
+      [title]: prev[title] === false ? true : false,
+    }));
   };
 
   const isLinkActive = (href: string) => {
@@ -401,7 +404,7 @@ export function WorkspaceSidebar() {
       {/* Navigation Groups (Scrollable) */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 custom-scrollbar">
         {groups.map((group) => {
-          const isOpen = openGroups[group.title] ?? true;
+          const isOpen = openGroups[group.title] !== false;
 
           return (
             <div key={group.title} className="space-y-1">

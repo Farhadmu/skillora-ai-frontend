@@ -24,7 +24,7 @@ import {
   Cpu,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { api, getCurrentUser } from '@/lib/api';
+import { api, getCurrentUser, setAuthSession } from '@/lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,7 +38,6 @@ export default function DashboardPage() {
   const [cvSuccess, setCvSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if authenticated user belongs to another role and route them to their dedicated dashboard
     const currentUser = getCurrentUser();
     if (currentUser?.role === 'EDUCATOR') {
       router.replace('/educator/dashboard');
@@ -52,22 +51,25 @@ export default function DashboardPage() {
       router.replace('/admin/dashboard');
       return;
     }
+    if (currentUser?.role === 'LEARNER') {
+      router.replace('/learner/dashboard');
+      return;
+    }
 
     loadDashboardData();
   }, [router]);
 
   const loadDashboardData = async () => {
     try {
-      // Ensure authenticated or log in as default learner
       let user = getCurrentUser();
       if (!user) {
         const loginRes = await api.login({
           email: 'learner@skillora.ai',
           password: 'Password123!',
         });
-        localStorage.setItem('skillora_access_token', loginRes.tokens.accessToken);
-        localStorage.setItem('skillora_user', JSON.stringify(loginRes.user));
-        user = loginRes.user;
+        setAuthSession(loginRes.tokens, loginRes.user);
+        router.replace('/learner/dashboard');
+        return;
       }
 
       const [profData, readData, roadData, jobsData] = await Promise.all([

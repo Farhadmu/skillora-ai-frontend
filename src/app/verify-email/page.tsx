@@ -39,7 +39,7 @@ function VerifyEmailContent() {
       setSuccess(true);
       setVerifiedUser(res.user);
       if (res.tokens) {
-        setAuthSession(res.tokens.accessToken, res.user);
+        setAuthSession(res.tokens, res.user);
       }
     } catch (err: any) {
       setError(

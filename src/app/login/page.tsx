@@ -31,7 +31,7 @@ export default function LoginPage() {
 
     try {
       const res = await api.login({ email, password });
-      setAuthSession(res.tokens.accessToken, res.user);
+      setAuthSession(res.tokens, res.user);
 
       if (res.user.role === 'EDUCATOR') router.push('/educator/dashboard');
       else if (res.user.role === 'EMPLOYER') router.push('/employer/dashboard');
