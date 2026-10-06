@@ -48,7 +48,9 @@ export function Navbar({
     clearAuthSession();
     setUser(null);
     setDropdownOpen(false);
-    router.push('/login');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   // Helper to determine the correct role-specific dashboard route

@@ -23,7 +23,7 @@ import {
   PanelLeft,
 } from 'lucide-react';
 import { useWorkspace, WorkspaceRole } from './WorkspaceContext';
-import { getCurrentUser, clearAuthSession } from '@/lib/api';
+import { getCurrentUser, clearAuthSession, switchWorkspaceRole } from '@/lib/api';
 
 export function WorkspaceTopbar() {
   const pathname = usePathname();
@@ -49,7 +49,9 @@ export function WorkspaceTopbar() {
     clearAuthSession();
     setUser(null);
     setProfileDropdownOpen(false);
-    router.push('/login');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   // Build dynamic breadcrumbs from current pathname
@@ -264,6 +266,74 @@ export function WorkspaceTopbar() {
                   <Settings className="w-4 h-4 text-zinc-400" />
                   <span>Settings & Security</span>
                 </Link>
+              </div>
+
+              {/* 1-Click Role Switcher for Platform Evaluation */}
+              <div className="pt-2 pb-1 border-t border-[#1a2236]">
+                <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                  Switch Workspace
+                </div>
+                <div className="space-y-0.5 mt-1">
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      switchWorkspaceRole('LEARNER');
+                    }}
+                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
+                      role === 'LEARNER'
+                        ? 'bg-emerald-500/15 text-emerald-300 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
+                    }`}
+                  >
+                    <span>🎓 Learner OS</span>
+                    {role === 'LEARNER' && <span className="text-[10px] text-emerald-400">Active</span>}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      switchWorkspaceRole('EDUCATOR');
+                    }}
+                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
+                      role === 'EDUCATOR'
+                        ? 'bg-cyan-500/15 text-cyan-300 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
+                    }`}
+                  >
+                    <span>🏫 Educator Console</span>
+                    {role === 'EDUCATOR' && <span className="text-[10px] text-cyan-400">Active</span>}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      switchWorkspaceRole('EMPLOYER');
+                    }}
+                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
+                      role === 'EMPLOYER'
+                        ? 'bg-purple-500/15 text-purple-300 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
+                    }`}
+                  >
+                    <span>🏢 Employer ATS</span>
+                    {role === 'EMPLOYER' && <span className="text-[10px] text-purple-400">Active</span>}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      switchWorkspaceRole('ADMIN');
+                    }}
+                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
+                      role === 'ADMIN'
+                        ? 'bg-amber-500/15 text-amber-300 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
+                    }`}
+                  >
+                    <span>🛡️ Admin Governance</span>
+                    {role === 'ADMIN' && <span className="text-[10px] text-amber-400">Active</span>}
+                  </button>
+                </div>
               </div>
 
               <div className="pt-1.5 border-t border-[#1a2236]">

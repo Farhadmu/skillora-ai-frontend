@@ -327,7 +327,9 @@ export function WorkspaceSidebar() {
     clearAuthSession();
     setUser(null);
     if (mobileSidebarOpen) setMobileSidebarOpen(false);
-    router.push('/login');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   const roleMeta: Record<

@@ -82,7 +82,9 @@ export function DashboardSidebar({
     clearAuthSession();
     setUser(null);
     if (onCloseMobile) onCloseMobile();
-    router.push('/login');
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
   };
 
   // Define navigation categories for LEARNER

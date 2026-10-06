@@ -25,7 +25,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { api } from '@/lib/api';
+import { api, switchWorkspaceRole } from '@/lib/api';
 
 interface AiProvider {
   name: string;
@@ -175,23 +175,11 @@ export default function AdminPage() {
     }
   };
 
-  const handleImpersonate = (role: string) => {
-    localStorage.setItem(
-      'skillora_mock_user',
-      JSON.stringify({
-        id: `mock-${role.toLowerCase()}`,
-        name: `Active ${role}`,
-        role,
-        email: `${role.toLowerCase()}@skillora.ai`,
-      }),
-    );
-    setRoleToast(`Impersonating ${role} persona. Redirecting...`);
+  const handleImpersonate = (targetRole: string) => {
+    setRoleToast(`Switching to ${targetRole} persona. Redirecting...`);
     setTimeout(() => {
-      if (role === 'LEARNER') window.location.href = '/dashboard';
-      else if (role === 'EDUCATOR') window.location.href = '/educator';
-      else if (role === 'EMPLOYER') window.location.href = '/employer';
-      else window.location.href = '/admin';
-    }, 1000);
+      switchWorkspaceRole(targetRole as any);
+    }, 400);
   };
 
   return (

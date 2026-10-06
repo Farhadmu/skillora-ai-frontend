@@ -13,8 +13,8 @@ import { WorkspaceBottomNav } from './WorkspaceBottomNav';
 import { CommandPalette } from '@/components/common/CommandPalette';
 import { NotificationsDrawer } from '@/components/common/NotificationsDrawer';
 import { AiAssistantDrawer } from '@/components/common/AiAssistantDrawer';
-import { getCurrentUser, api, setAuthSession } from '@/lib/api';
-import { ShieldAlert, ArrowRight, Lock } from 'lucide-react';
+import { getCurrentUser, api, setAuthSession, switchWorkspaceRole } from '@/lib/api';
+import { ShieldAlert, ArrowRight, Lock, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 interface WorkspaceShellProps {
@@ -48,32 +48,20 @@ function WorkspaceInner({
     let user = getCurrentUser();
 
     if (!user) {
-      // Auto-authenticate with canonical role account if session is empty
-      api
-        .login({
-          email: `${role.toLowerCase()}@skillora.ai`,
-          password: 'Password123!',
-        })
-        .then((loginRes) => {
-          setAuthSession(loginRes.tokens, loginRes.user);
-          setCurrentUser(loginRes.user);
-          setIsAuthorized(true);
-          setAuthChecked(true);
-        })
-        .catch(() => {
-          router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
-        });
+      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
 
     setCurrentUser(user);
 
-    // Role-based authorization check
-    if (role === 'ADMIN' && user.role !== 'ADMIN') {
+    // Super-admin clearance: ADMIN role can inspect all workspaces
+    if (user.role === 'ADMIN') {
+      setIsAuthorized(true);
+    } else if (role === 'ADMIN' && user.role !== 'ADMIN') {
       setIsAuthorized(false);
-    } else if (role === 'EMPLOYER' && user.role !== 'EMPLOYER' && user.role !== 'ADMIN') {
+    } else if (role === 'EMPLOYER' && user.role !== 'EMPLOYER') {
       setIsAuthorized(false);
-    } else if (role === 'EDUCATOR' && user.role !== 'EDUCATOR' && user.role !== 'ADMIN') {
+    } else if (role === 'EDUCATOR' && user.role !== 'EDUCATOR') {
       setIsAuthorized(false);
     } else {
       setIsAuthorized(true);
@@ -103,27 +91,35 @@ function WorkspaceInner({
 
     return (
       <div className="min-h-screen bg-[#06080d] flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-8 rounded-3xl bg-[#0b0f19] border border-rose-500/30 shadow-2xl text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center">
-            <ShieldAlert className="w-8 h-8 text-rose-400" />
+        <div className="max-w-md w-full p-8 rounded-3xl bg-[#0b0f19] border border-amber-500/30 shadow-2xl text-center space-y-5 animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+            <ShieldAlert className="w-8 h-8 text-amber-400" />
           </div>
 
           <div className="space-y-2">
             <h2 className="text-xl font-black text-white tracking-wide">
-              Access Restricted
+              Role Clearance Required
             </h2>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              This workspace requires <span className="font-bold text-rose-400 font-mono">{role}</span> privileges. You are authenticated under the <span className="font-bold text-emerald-400 font-mono">{userRole}</span> role.
+              This workspace is calibrated for <span className="font-bold text-amber-400 font-mono">{role}</span> operations. You are currently authenticated as <span className="font-bold text-emerald-400 font-mono">{userRole}</span>.
             </p>
           </div>
 
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => switchWorkspaceRole(role)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-zinc-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition active:scale-95"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Switch to {role} Account</span>
+            </button>
+
             <Link
               href={returnUrl}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition active:scale-95"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#141d30] hover:bg-[#1a2640] border border-[#23314e] text-zinc-200 font-semibold text-xs transition active:scale-95"
             >
-              <span>Return to Your {userRole} Workspace</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Return to {userRole}</span>
+              <ArrowRight className="w-4 h-4 text-zinc-400" />
             </Link>
           </div>
         </div>
