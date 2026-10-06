@@ -37,6 +37,7 @@ export default function DashboardPage() {
   const [cvText, setCvText] = useState('');
   const [cvParsing, setCvParsing] = useState(false);
   const [cvSuccess, setCvSuccess] = useState<string | null>(null);
+  const [generatingRoadmap, setGeneratingRoadmap] = useState(false);
 
   useEffect(() => {
     // ONLY perform role redirection when explicitly visiting the generic '/dashboard' root route
@@ -86,6 +87,21 @@ export default function DashboardPage() {
     }
   };
 
+  const handleGenerateRoadmap = async () => {
+    setGeneratingRoadmap(true);
+    try {
+      const newRoadmap = await api.generateRoadmap({
+        targetRole: profile?.targetRole || 'Full-Stack AI Systems Engineer',
+        timeframeWeeks: 4,
+      });
+      setRoadmap(newRoadmap);
+    } catch (err) {
+      console.error('Failed to generate roadmap:', err);
+    } finally {
+      setGeneratingRoadmap(false);
+    }
+  };
+
   const handleToggleMilestone = async (milestoneIndex: number) => {
     if (!roadmap) return;
     try {
@@ -131,14 +147,21 @@ export default function DashboardPage() {
               <span>Learner Intelligence Command Center</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Welcome back, {profile?.name || 'Farhadul Islam'}
+              Welcome back, {profile?.name || 'Learner'}
             </h1>
             <p className="text-xs text-zinc-400 mt-0.5">
               Target Role:{' '}
               <strong className="text-white">
-                {profile?.targetRole || 'Full-Stack AI Systems Engineer'}
+                {profile?.targetRole || 'Select Target Career'}
               </strong>{' '}
-              • Verified Readiness: <strong className="text-emerald-400">{profile?.readinessScore || 84}/100</strong>
+              • Verified Readiness:{' '}
+              <strong className="text-emerald-400">
+                {readiness?.overallScore != null
+                  ? `${readiness.overallScore}/100`
+                  : profile?.readinessScore != null
+                  ? `${profile.readinessScore}/100`
+                  : 'Pending Diagnostic'}
+              </strong>
             </p>
           </div>
 
@@ -201,45 +224,60 @@ export default function DashboardPage() {
                   7-D Readiness Score
                 </div>
                 <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
-                  Verified
+                  {readiness?.overallScore != null ? 'Verified' : 'Pending'}
                 </span>
               </div>
 
-              <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-5xl font-extrabold text-white tracking-tight">
-                  {readiness?.overallScore || 84}
-                </span>
-                <span className="text-sm text-zinc-500 font-mono">/ 100</span>
-                <span className="ml-auto text-xs font-semibold text-emerald-400">
-                  {readiness?.employabilityStatus || 'Job Ready'}
-                </span>
-              </div>
-
-              {/* 7 Dimensions Bar Breakdown */}
-              <div className="space-y-2.5 text-xs">
-                {[
-                  { name: 'Technical Rigor', val: readiness?.dimensions?.technical || 88 },
-                  { name: 'Problem Solving', val: readiness?.dimensions?.problemSolving || 85 },
-                  { name: 'Applied Projects', val: readiness?.dimensions?.projects || 86 },
-                  { name: 'Communication', val: readiness?.dimensions?.communication || 80 },
-                  { name: 'Interview Mastery', val: readiness?.dimensions?.interview || 82 },
-                  { name: 'Role Alignment', val: readiness?.dimensions?.roleAlignment || 84 },
-                  { name: 'Production Practical', val: readiness?.dimensions?.practical || 81 },
-                ].map((dim, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-zinc-400">{dim.name}</span>
-                      <span className="text-zinc-200 font-mono font-semibold">{dim.val}%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#141b2b] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 rounded-full"
-                        style={{ width: `${dim.val}%` }}
-                      />
-                    </div>
+              {readiness?.overallScore != null ? (
+                <>
+                  <div className="flex items-baseline gap-2 mb-6">
+                    <span className="text-5xl font-extrabold text-white tracking-tight">
+                      {readiness.overallScore}
+                    </span>
+                    <span className="text-sm text-zinc-500 font-mono">/ 100</span>
+                    <span className="ml-auto text-xs font-semibold text-emerald-400">
+                      {readiness.employabilityStatus || 'Active'}
+                    </span>
                   </div>
-                ))}
-              </div>
+
+                  {/* 7 Dimensions Bar Breakdown */}
+                  <div className="space-y-2.5 text-xs">
+                    {[
+                      { name: 'Technical Rigor', val: readiness.dimensions?.technical || 0 },
+                      { name: 'Problem Solving', val: readiness.dimensions?.problemSolving || 0 },
+                      { name: 'Applied Projects', val: readiness.dimensions?.projects || 0 },
+                      { name: 'Communication', val: readiness.dimensions?.communication || 0 },
+                      { name: 'Interview Mastery', val: readiness.dimensions?.interview || 0 },
+                      { name: 'Role Alignment', val: readiness.dimensions?.roleAlignment || 0 },
+                      { name: 'Production Practical', val: readiness.dimensions?.practical || 0 },
+                    ].map((dim, idx) => (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex justify-between text-[11px]">
+                          <span className="text-zinc-400">{dim.name}</span>
+                          <span className="text-zinc-200 font-mono font-semibold">{dim.val}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-[#141b2b] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 rounded-full"
+                            style={{ width: `${dim.val}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="py-8 text-center text-zinc-400 text-xs space-y-3">
+                  <AlertCircle className="w-8 h-8 text-zinc-500 mx-auto" />
+                  <p>Complete your profile and take a diagnostic drill to calculate your 7-D readiness score.</p>
+                  <Link
+                    href="/learner/interview"
+                    className="inline-block px-4 py-2 rounded-xl bg-emerald-500 text-black font-bold text-xs"
+                  >
+                    Start Diagnostic Assessment
+                  </Link>
+                </div>
+              )}
             </div>
 
             <div className="pt-6 mt-6 border-t border-[#141b2b]">
@@ -255,79 +293,103 @@ export default function DashboardPage() {
 
           {/* Active SkillBridge Roadmap */}
           <div className="lg:col-span-2 p-6 rounded-2xl bg-[#0b0f19] border border-[#1e293b] flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Map className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Active Roadmap ({roadmap?.durationDays || 30} Days)
-                  </span>
+            {roadmap ? (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Map className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                      Active Roadmap ({roadmap?.durationDays || 30} Days)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-400">Progress:</span>
+                    <span className="text-xs font-bold text-emerald-400 font-mono">
+                      {roadmap?.progressPercent ?? 0}%
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-400">Progress:</span>
-                  <span className="text-xs font-bold text-emerald-400 font-mono">
-                    {roadmap?.progressPercent || 68}%
-                  </span>
-                </div>
-              </div>
 
-              {/* Progress Bar */}
-              <div className="w-full h-2 bg-[#141b2b] rounded-full overflow-hidden mb-6">
-                <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${roadmap?.progressPercent || 68}%` }}
-                />
-              </div>
-
-              {/* Milestones list */}
-              <div className="space-y-3">
-                {roadmap?.milestones?.map((m: any, idx: number) => (
+                {/* Progress Bar */}
+                <div className="w-full h-2 bg-[#141b2b] rounded-full overflow-hidden mb-6">
                   <div
-                    key={idx}
-                    className={`p-3.5 rounded-xl border transition ${
-                      m.completed
-                        ? 'bg-[#0a121c] border-emerald-500/30'
-                        : 'bg-[#0e1424] border-[#161f33]'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-2.5">
-                        <button
-                          onClick={() => handleToggleMilestone(idx)}
-                          className={`mt-0.5 w-4 h-4 rounded flex items-center justify-center transition ${
-                            m.completed
-                              ? 'bg-emerald-500 text-black'
-                              : 'border border-zinc-600 hover:border-emerald-400'
-                          }`}
-                        >
-                          {m.completed && <CheckCircle2 className="w-3.5 h-3.5" />}
-                        </button>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-mono font-bold text-zinc-500">
-                              {m.dayRange}
-                            </span>
-                            <span className="text-xs font-bold text-white">{m.title}</span>
-                          </div>
-                          <div className="text-[11px] text-zinc-400 mt-1">
-                            Focus: <strong className="text-emerald-300">{m.focusSkill}</strong> • {m.tasks?.[0]}
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                    style={{ width: `${roadmap?.progressPercent ?? 0}%` }}
+                  />
+                </div>
+
+                {/* Milestones list */}
+                <div className="space-y-3">
+                  {roadmap?.milestones?.map((m: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className={`p-3.5 rounded-xl border transition ${
+                        m.completed
+                          ? 'bg-[#0a121c] border-emerald-500/30'
+                          : 'bg-[#0e1424] border-[#161f33]'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-2.5">
+                          <button
+                            onClick={() => handleToggleMilestone(idx)}
+                            className={`mt-0.5 w-4 h-4 rounded flex items-center justify-center transition ${
+                              m.completed
+                                ? 'bg-emerald-500 text-black'
+                                : 'border border-zinc-600 hover:border-emerald-400'
+                            }`}
+                          >
+                            {m.completed && <CheckCircle2 className="w-3.5 h-3.5" />}
+                          </button>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-mono font-bold text-zinc-500">
+                                {m.dayRange}
+                              </span>
+                              <span className="text-xs font-bold text-white">{m.title}</span>
+                            </div>
+                            <div className="text-[11px] text-zinc-400 mt-1">
+                              Focus: <strong className="text-emerald-300">{m.focusSkill}</strong> • {m.tasks?.[0]}
+                            </div>
                           </div>
                         </div>
+                        <span
+                          className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+                            m.completed
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-zinc-800 text-zinc-400'
+                          }`}
+                        >
+                          {m.completed ? 'Completed' : 'In Progress'}
+                        </span>
                       </div>
-                      <span
-                        className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-                          m.completed
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-zinc-800 text-zinc-400'
-                        }`}
-                      >
-                        {m.completed ? 'Completed' : 'In Progress'}
-                      </span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="py-12 text-center text-zinc-400 text-xs space-y-4 my-auto">
+                <Map className="w-10 h-10 text-zinc-600 mx-auto" />
+                <div>
+                  <div className="text-sm font-bold text-white mb-1">No Active Pathway Found</div>
+                  <p className="text-zinc-500 max-w-sm mx-auto">
+                    Generate an adaptive 30-day SkillBridge roadmap tailored to your target career role.
+                  </p>
+                </div>
+                <button
+                  onClick={handleGenerateRoadmap}
+                  disabled={generatingRoadmap}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition inline-flex items-center gap-2"
+                >
+                  {generatingRoadmap ? (
+                    <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3.5 h-3.5" />
+                  )}
+                  <span>Generate 30-Day Roadmap</span>
+                </button>
+              </div>
+            )}
 
             <div className="pt-4 mt-6 border-t border-[#141b2b] flex items-center justify-between text-xs">
               <span className="text-zinc-500">Milestones adapt dynamically as tasks are checked.</span>
@@ -358,34 +420,41 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {profile?.skills?.map((s: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-xl bg-[#0e1424] border border-[#161f33] flex flex-col justify-between"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-bold text-white">{s.name}</span>
-                    <span
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                        s.verified
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-zinc-800 text-zinc-400'
-                      }`}
-                    >
-                      {s.verified ? 'Verified Proof' : 'Pending Proof'}
-                    </span>
+            {profile?.skills && profile.skills.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {profile.skills.map((s: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl bg-[#0e1424] border border-[#161f33] flex flex-col justify-between"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-white">{s.name}</span>
+                      <span
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                          s.verified
+                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-zinc-800 text-zinc-400'
+                        }`}
+                      >
+                        {s.verified ? 'Verified Proof' : 'Pending Proof'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-2">
+                      <span>Proficiency: <strong className="text-white">{s.proficiency}%</strong></span>
+                      <span>Confidence: <strong className="text-emerald-400">{s.confidence}%</strong></span>
+                    </div>
+                    <div className="text-[10px] text-zinc-500 truncate">
+                      Evidence: {s.evidence?.[0] || 'Direct project assessment'}
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-2">
-                    <span>Proficiency: <strong className="text-white">{s.proficiency}%</strong></span>
-                    <span>Confidence: <strong className="text-emerald-400">{s.confidence}%</strong></span>
-                  </div>
-                  <div className="text-[10px] text-zinc-500 truncate">
-                    Evidence: {s.evidence?.[0] || 'Direct project assessment'}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-8 text-center text-zinc-500 text-xs space-y-2">
+                <Cpu className="w-6 h-6 mx-auto text-zinc-600" />
+                <p>No verified skills yet. Paste your CV or take an assessment to populate your skill graph.</p>
+              </div>
+            )}
           </div>
 
           {/* Quick AI Launch Tools */}
@@ -476,38 +545,45 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {jobs.map((job) => (
-              <div
-                key={job.id}
-                className="p-4 rounded-xl bg-[#0e1424] border border-[#161f33] hover:border-emerald-500/40 transition flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      {job.matchScore || 92}% Match
-                    </span>
-                    <span className="text-xs font-mono text-zinc-400">{job.salaryRange}</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-white mb-1">{job.title}</h4>
-                  <div className="text-xs text-zinc-400 mb-3">{job.companyName} • {job.location}</div>
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {job.requiredSkills?.slice(0, 3).map((sk: string, i: number) => (
-                      <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-[#111726] text-zinc-300">
-                        {sk}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <Link
-                  href="/learner/jobs"
-                  className="w-full py-2 text-center rounded-lg bg-[#162035] hover:bg-emerald-500 hover:text-black font-semibold text-xs text-zinc-200 transition"
+          {jobs && jobs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {jobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="p-4 rounded-xl bg-[#0e1424] border border-[#161f33] hover:border-emerald-500/40 transition flex flex-col justify-between"
                 >
-                  Inspect & Apply
-                </Link>
-              </div>
-            ))}
-          </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        {job.matchScore || 0}% Match
+                      </span>
+                      <span className="text-xs font-mono text-zinc-400">{job.salaryRange}</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white mb-1">{job.title}</h4>
+                    <div className="text-xs text-zinc-400 mb-3">{job.companyName} • {job.location}</div>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {job.requiredSkills?.slice(0, 3).map((sk: string, i: number) => (
+                        <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-[#111726] text-zinc-300">
+                          {sk}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <Link
+                    href="/learner/jobs"
+                    className="w-full py-2 text-center rounded-lg bg-[#162035] hover:bg-emerald-500 hover:text-black font-semibold text-xs text-zinc-200 transition"
+                  >
+                    Inspect & Apply
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center text-zinc-500 text-xs space-y-2">
+              <Briefcase className="w-6 h-6 mx-auto text-zinc-600" />
+              <p>No jobs found. Explore the marketplace or update your target role to receive recommendations.</p>
+            </div>
+          )}
         </div>
       </div>
 

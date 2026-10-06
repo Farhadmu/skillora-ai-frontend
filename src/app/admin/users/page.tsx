@@ -29,57 +29,50 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [toast, setToast] = useState('');
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [users, setUsers] = useState<UserRecord[]>([
-    {
-      id: 'usr-1',
-      name: 'Alex Johnson',
-      email: 'alex.j@example.com',
-      role: 'LEARNER',
-      status: 'ACTIVE',
-      emailVerified: true,
-      createdAt: 'Sep 12, 2026',
-    },
-    {
-      id: 'usr-2',
-      name: 'Dr. Alan Mitchell',
-      email: 'alan.mitchell@skillora.edu',
-      role: 'EDUCATOR',
-      status: 'ACTIVE',
-      emailVerified: true,
-      createdAt: 'Aug 20, 2026',
-    },
-    {
-      id: 'usr-3',
-      name: 'Sarah Jenkins (TechScale)',
-      email: 'sarah.j@techscale.ai',
-      role: 'EMPLOYER',
-      status: 'ACTIVE',
-      emailVerified: true,
-      createdAt: 'Aug 28, 2026',
-    },
-    {
-      id: 'usr-4',
-      name: 'Root Governance SecOps',
-      email: 'secops@skillora.ai',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      emailVerified: true,
-      createdAt: 'Jan 01, 2026',
-    },
-  ]);
+  React.useEffect(() => {
+    loadUsers();
+  }, [roleFilter]);
 
-  const toggleStatus = (id: string) => {
-    setUsers(
-      users.map((u) => {
-        if (u.id === id) {
-          const newStatus = u.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-          setToast(`User ${u.email} status updated to ${newStatus}`);
-          return { ...u, status: newStatus };
-        }
-        return u;
-      }),
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await api.listUsers(roleFilter === 'ALL' ? undefined : roleFilter);
+      if (Array.isArray(data)) {
+        setUsers(
+          data.map((u: any) => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            role: u.role,
+            status: u.status === 'suspended' ? 'SUSPENDED' : 'ACTIVE',
+            emailVerified: u.isVerified ?? true,
+            createdAt: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active',
+          })),
+        );
+      }
+    } catch (err) {
+      console.error('Failed to load admin users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleStatus = async (id: string) => {
+    const user = users.find((u) => u.id === id);
+    if (!user) return;
+    const newStatus = user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+    setUsers((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, status: newStatus } : u)),
     );
+    try {
+      await api.updateUserStatus(id, newStatus.toLowerCase());
+      setToast(`User ${user.email} status updated to ${newStatus}`);
+    } catch (err: any) {
+      console.error('Failed to update status:', err);
+    }
     setTimeout(() => setToast(''), 3000);
   };
 

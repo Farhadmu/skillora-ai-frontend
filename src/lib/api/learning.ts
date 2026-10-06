@@ -15,11 +15,25 @@ export const learningApi = {
     apiClient<any[]>(`/api/ai-teacher/flashcards${topic ? `?topic=${encodeURIComponent(topic)}` : ''}`),
 
   getRoadmap: () => apiClient<any>('/api/skillbridge/roadmap'),
-  generateRoadmap: (targetRole: string, durationDays = 30) =>
-    apiClient<any>('/api/skillbridge/roadmap/generate', {
+  generateRoadmap: (
+    targetRoleOrOptions: string | { targetRole?: string; durationDays?: number; timeframeWeeks?: number },
+    durationDays = 30,
+  ) => {
+    const targetRole =
+      typeof targetRoleOrOptions === 'string'
+        ? targetRoleOrOptions
+        : targetRoleOrOptions?.targetRole || 'Full-Stack Software Engineer';
+    const days =
+      typeof targetRoleOrOptions === 'object' && targetRoleOrOptions?.durationDays
+        ? targetRoleOrOptions.durationDays
+        : typeof targetRoleOrOptions === 'object' && targetRoleOrOptions?.timeframeWeeks
+        ? targetRoleOrOptions.timeframeWeeks * 7
+        : durationDays;
+    return apiClient<any>('/api/skillbridge/roadmap/generate', {
       method: 'POST',
-      body: JSON.stringify({ targetRole, durationDays }),
-    }),
+      body: JSON.stringify({ targetRole, durationDays: days }),
+    });
+  },
   toggleRoadmapTask: (milestoneIndex: number, taskIndex: number, completed: boolean) =>
     apiClient<any>('/api/skillbridge/roadmap/toggle', {
       method: 'PATCH',

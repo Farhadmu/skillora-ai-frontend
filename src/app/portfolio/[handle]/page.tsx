@@ -88,9 +88,11 @@ export default function PortfolioPage() {
                 Readiness Score
               </div>
               <div className="text-3xl font-extrabold text-emerald-400 font-mono mt-0.5">
-                {portfolio?.readinessScore || 84}/100
+                {portfolio?.readinessScore != null ? `${portfolio.readinessScore}/100` : 'Pending'}
               </div>
-              <div className="text-[10px] text-zinc-400 mt-0.5">Job Ready Certified</div>
+              <div className="text-[10px] text-zinc-400 mt-0.5">
+                {portfolio?.readinessScore >= 80 ? 'Job Ready Certified' : 'Verified Skills In Progress'}
+              </div>
             </div>
           </div>
 

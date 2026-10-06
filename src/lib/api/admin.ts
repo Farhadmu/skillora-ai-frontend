@@ -9,6 +9,11 @@ export const adminApi = {
       method: 'PATCH',
       body: JSON.stringify({ role }),
     }),
+  updateUserStatus: (userId: string, status: string) =>
+    apiClient<any>(`/api/admin/users/${userId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
   listAiProviders: () => apiClient<any[]>('/api/admin/ai-providers'),
   testAiProvider: (providerName: string) =>
     apiClient<any>('/api/admin/ai-providers/test', {
@@ -16,3 +21,4 @@ export const adminApi = {
       body: JSON.stringify({ providerName }),
     }),
 };
+

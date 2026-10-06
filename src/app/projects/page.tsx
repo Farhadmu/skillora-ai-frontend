@@ -31,6 +31,14 @@ export default function ProjectsPage() {
   const [reviewResult, setReviewResult] = useState<any>(null);
   const [reviewing, setReviewing] = useState(false);
 
+  // Project Submission Modal state
+  const [submittingProj, setSubmittingProj] = useState<any | null>(null);
+  const [githubRepoUrl, setGithubRepoUrl] = useState('');
+  const [liveDemoUrl, setLiveDemoUrl] = useState('');
+  const [projectNotes, setProjectNotes] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
+
   useEffect(() => {
     loadProjects();
   }, [selectedCategory, selectedDiff]);
@@ -60,6 +68,33 @@ export default function ProjectsPage() {
       console.error('Code review failed:', err);
     } finally {
       setReviewing(false);
+    }
+  };
+
+  const handleProjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!submittingProj || !githubRepoUrl.trim()) return;
+    setSubmitting(true);
+    setSubmissionSuccess(null);
+
+    try {
+      const res = await api.submitProject(submittingProj.id, {
+        githubRepoUrl,
+        liveDemoUrl,
+        notes: projectNotes,
+      });
+      setSubmissionSuccess(res?.message || 'Project submitted and verified successfully!');
+      setTimeout(() => {
+        setSubmittingProj(null);
+        setSubmissionSuccess(null);
+        setGithubRepoUrl('');
+        setLiveDemoUrl('');
+        setProjectNotes('');
+      }, 2000);
+    } catch (err: any) {
+      console.error('Project submission failed:', err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -291,12 +326,10 @@ export default function ProjectsPage() {
                     <span>Starter Repo</span>
                   </a>
                   <button
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="text-xs font-bold text-emerald-400 hover:underline flex items-center gap-1"
+                    onClick={() => setSubmittingProj(proj)}
+                    className="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40"
                   >
-                    <span>Submit Code</span>
+                    <span>Submit Project</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -304,7 +337,99 @@ export default function ProjectsPage() {
             ))}
           </div>
         </div>
+
+        {/* Project Submission Modal */}
+        {submittingProj && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="w-full max-w-lg rounded-2xl bg-[#0b0f19] border border-[#1e293b] p-6 shadow-2xl space-y-5">
+              <div className="flex items-center justify-between pb-4 border-b border-[#161f33]">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                    Verified Skill Evidence
+                  </span>
+                  <h3 className="text-lg font-bold text-white mt-0.5">
+                    Submit Project: {submittingProj.title}
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setSubmittingProj(null)}
+                  className="text-zinc-400 hover:text-white text-xs px-2.5 py-1 rounded-lg border border-[#1e293b]"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              {submissionSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>{submissionSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleProjectSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                    GitHub Repository URL *
+                  </label>
+                  <input
+                    type="url"
+                    required
+                    value={githubRepoUrl}
+                    onChange={(e) => setGithubRepoUrl(e.target.value)}
+                    placeholder="https://github.com/your-username/repo-name"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#070b12] border border-[#1a2336] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                    Live Demo URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={liveDemoUrl}
+                    onChange={(e) => setLiveDemoUrl(e.target.value)}
+                    placeholder="https://my-app.vercel.app"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#070b12] border border-[#1a2336] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                    Implementation Notes / Architecture Highlights
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={projectNotes}
+                    onChange={(e) => setProjectNotes(e.target.value)}
+                    placeholder="Implemented token bucket rate limiter with Redis, added unit test coverage..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#070b12] border border-[#1a2336] text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSubmittingProj(null)}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                  >
+                    <span>{submitting ? 'Submitting & Verifying...' : 'Submit & Verify Skills'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </DashboardLayout>
   );
 }
+

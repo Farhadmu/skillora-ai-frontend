@@ -20,6 +20,26 @@ export default function SkillGapPage() {
   );
   const [jdResult, setJdResult] = useState<any>(null);
   const [analyzingJd, setAnalyzingJd] = useState(false);
+  const [gapData, setGapData] = useState<any>(null);
+  const [loadingGaps, setLoadingGaps] = useState(true);
+
+  React.useEffect(() => {
+    loadGaps();
+  }, []);
+
+  const loadGaps = async () => {
+    setLoadingGaps(true);
+    try {
+      const prof = await api.getMyProfile().catch(() => null);
+      const role = prof?.targetRole || 'Full-Stack AI Systems Engineer';
+      const res = await api.getSkillGaps(role);
+      setGapData(res);
+    } catch (e) {
+      console.error('Failed to load skill gaps:', e);
+    } finally {
+      setLoadingGaps(false);
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!jdText.trim()) return;
@@ -34,38 +54,21 @@ export default function SkillGapPage() {
     }
   };
 
-  const currentGaps = [
-    {
-      skill: 'Distributed Caching (Redis)',
-      priority: 'HIGH',
-      impact: '+6% Readiness',
-      current: '65% (Intermediate)',
-      target: '85% (Production Mastery)',
-      why: 'Top tech employers mandate cache invalidation patterns to protect vector retrieval pipelines under 1,000+ RPS.',
+  const currentGaps = (gapData?.missing || gapData?.criticalGaps || []).slice(0, 5).map((m: any, idx: number) => {
+    const name = typeof m === 'string' ? m : m.skillName || m.name || 'System Design';
+    const cur = typeof m === 'object' && m.currentProficiency ? `${m.currentProficiency}%` : '20% (Foundational)';
+    const tgt = typeof m === 'object' && m.targetProficiency ? `${m.targetProficiency}%` : '85% (Production Mastery)';
+    return {
+      skill: name,
+      priority: idx === 0 ? 'CRITICAL' : 'HIGH',
+      impact: `+${Math.max(4, 8 - idx)}% Readiness`,
+      current: cur,
+      target: tgt,
+      why: `Key competency needed for target role qualification. Validated through employer job specifications.`,
       actionUrl: '/learner/assessments',
-      actionText: 'Take Redis Diagnostics Drill',
-    },
-    {
-      skill: 'Kubernetes Pod Lifecycle & Helm Charts',
-      priority: 'MEDIUM',
-      impact: '+5% Readiness',
-      current: '45% (Beginner)',
-      target: '80% (Intermediate Ops)',
-      why: 'Required for container orchestration and autoscaling AI inference microservices.',
-      actionUrl: '/learner/learning/ai-teacher',
-      actionText: 'Study in Socratic Lab',
-    },
-    {
-      skill: 'Asynchronous Event Broker (Kafka / BullMQ)',
-      priority: 'MEDIUM',
-      impact: '+4% Readiness',
-      current: '50% (Basic)',
-      target: '80% (Production Pipeline)',
-      why: 'Prevents blocking the web request cycle when embedding large knowledge documents.',
-      actionUrl: '/learner/build/coding',
-      actionText: 'Build Queue Lab',
-    },
-  ];
+      actionText: `Take ${name} Diagnostics Drill`,
+    };
+  });
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
@@ -102,7 +105,7 @@ export default function SkillGapPage() {
         </h2>
 
         <div className="grid grid-cols-1 gap-4">
-          {currentGaps.map((gap) => (
+          {currentGaps.map((gap: any) => (
             <div
               key={gap.skill}
               className="p-5 rounded-2xl bg-[#090d16] border border-[#1a2236] space-y-3"

@@ -114,15 +114,15 @@ export default function LearnerPortfolioPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-extrabold text-white">{profile?.name || 'Farhadul Islam'}</h2>
+                  <h2 className="text-xl font-extrabold text-white">{profile?.name || 'Talent'}</h2>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
                     <ShieldCheck className="w-3 h-3" />
                     Verified Talent
                   </span>
                 </div>
-                <p className="text-xs text-zinc-400 mt-0.5">{profile?.headline || 'Aspiring AI Systems & Full-Stack Architect'}</p>
+                <p className="text-xs text-zinc-400 mt-0.5">{profile?.headline || 'Verified Workforce Candidate'}</p>
                 <p className="text-[11px] text-zinc-500 font-mono mt-0.5">
-                  Target: {profile?.targetRole || 'Full-Stack AI Systems Engineer'} • Readiness: {profile?.readinessScore || 84}/100
+                  Target: {profile?.targetRole || 'Not Set'} • Readiness: {profile?.readinessScore != null ? `${profile.readinessScore}/100` : 'Pending'}
                 </p>
               </div>
             </div>
@@ -139,25 +139,33 @@ export default function LearnerPortfolioPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-4 rounded-xl bg-[#111726] border border-[#1e293b]">
               <div className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Overall Readiness</div>
-              <div className="text-2xl font-extrabold text-white mt-1">{readiness?.overallScore || 84}/100</div>
-              <div className="text-[11px] text-emerald-400 mt-1 font-semibold">{readiness?.employabilityStatus || 'Job Ready (High Match)'}</div>
+              <div className="text-2xl font-extrabold text-white mt-1">
+                {readiness?.overallScore != null
+                  ? `${readiness.overallScore}/100`
+                  : profile?.readinessScore != null
+                  ? `${profile.readinessScore}/100`
+                  : 'Pending'}
+              </div>
+              <div className="text-[11px] text-emerald-400 mt-1 font-semibold">{readiness?.employabilityStatus || 'In Progress'}</div>
             </div>
 
             <div className="p-4 rounded-xl bg-[#111726] border border-[#1e293b]">
               <div className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Verified Skills</div>
-              <div className="text-2xl font-extrabold text-white mt-1">{profile?.skills?.length || 8} Badges</div>
+              <div className="text-2xl font-extrabold text-white mt-1">{profile?.skills?.length || 0} Badges</div>
               <div className="text-[11px] text-zinc-400 mt-1">Backed by assessment & repos</div>
             </div>
 
             <div className="p-4 rounded-xl bg-[#111726] border border-[#1e293b]">
               <div className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Code Reviews Completed</div>
-              <div className="text-2xl font-extrabold text-white mt-1">12 Audits</div>
+              <div className="text-2xl font-extrabold text-white mt-1">{profile?.skills?.length ? `${profile.skills.length} Audits` : '0 Audits'}</div>
               <div className="text-[11px] text-cyan-400 mt-1">Clean Architecture certified</div>
             </div>
 
             <div className="p-4 rounded-xl bg-[#111726] border border-[#1e293b]">
               <div className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Mock Interview Score</div>
-              <div className="text-2xl font-extrabold text-white mt-1">82%</div>
+              <div className="text-2xl font-extrabold text-white mt-1">
+                {readiness?.dimensions?.interview != null ? `${readiness.dimensions.interview}%` : 'Pending'}
+              </div>
               <div className="text-[11px] text-purple-400 mt-1">System Design & Tech Rigor</div>
             </div>
           </div>

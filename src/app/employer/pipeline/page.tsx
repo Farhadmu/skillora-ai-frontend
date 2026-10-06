@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Layers,
@@ -14,6 +14,7 @@ import {
   UserCheck,
   XCircle,
 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 type Stage = 'New' | 'Screening' | 'Shortlisted' | 'Interview' | 'Offer' | 'Hired' | 'Rejected';
 
@@ -28,44 +29,37 @@ interface Candidate {
 }
 
 export default function EmployerPipelinePage() {
-  const [candidates, setCandidates] = useState<Candidate[]>([
-    {
-      id: 'c-1',
-      name: 'Candidate #8841 (Alex J.)',
-      role: 'Full-Stack AI Systems Engineer',
-      matchScore: 94,
-      stage: 'Shortlisted',
-      notes: 'Strong NestJS test coverage proof. Ready for interview.',
-      recruiter: 'Sarah Jenkins',
-    },
-    {
-      id: 'c-2',
-      name: 'Candidate #9102 (Elena R.)',
-      role: 'Backend Node.js Engineer',
-      matchScore: 89,
-      stage: 'Interview',
-      notes: 'Technical round scheduled for Thursday 2 PM.',
-      recruiter: 'Marcus Vance',
-    },
-    {
-      id: 'c-3',
-      name: 'Candidate #7419 (Tariq R.)',
-      role: 'Platform Reliability Engineer',
-      matchScore: 82,
-      stage: 'Screening',
-      notes: 'Reviewing Docker container lab submission.',
-      recruiter: 'Sarah Jenkins',
-    },
-    {
-      id: 'c-4',
-      name: 'Candidate #6120 (Chen W.)',
-      role: 'AI Applied Research Engineer',
-      matchScore: 91,
-      stage: 'Offer',
-      notes: 'Formal offer extended: $165,000 + equity.',
-      recruiter: 'Sarah Jenkins',
-    },
-  ]);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadPipeline();
+  }, []);
+
+  const loadPipeline = async () => {
+    setLoading(true);
+    try {
+      const data = await api.getEmployerCandidates();
+      if (Array.isArray(data) && data.length > 0) {
+        const formatted: Candidate[] = data.map((item: any, idx: number) => ({
+          id: item.id || `c-${idx}`,
+          name: item.candidateName || item.name || `Candidate #${idx + 1}`,
+          role: item.jobTitle || item.role || 'Full-Stack Software Engineer',
+          matchScore: item.matchScore || 88,
+          stage: (item.status
+            ? item.status.charAt(0).toUpperCase() + item.status.slice(1)
+            : 'Screening') as Stage,
+          notes: item.notes || 'Verified credentials and skill profile on Skillora AI.',
+          recruiter: item.recruiter || 'Engineering Hiring Team',
+        }));
+        setCandidates(formatted);
+      }
+    } catch (err) {
+      console.error('Failed to load candidate pipeline:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const stages: Stage[] = [
     'New',
@@ -77,10 +71,15 @@ export default function EmployerPipelinePage() {
     'Rejected',
   ];
 
-  const moveStage = (id: string, newStage: Stage) => {
-    setCandidates(
-      candidates.map((c) => (c.id === id ? { ...c, stage: newStage } : c)),
+  const moveStage = async (id: string, newStage: Stage) => {
+    setCandidates((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, stage: newStage } : c)),
     );
+    try {
+      await api.updateApplicationStage(id, newStage.toLowerCase());
+    } catch (err) {
+      console.error('Failed to persist stage update to backend:', err);
+    }
   };
 
   return (

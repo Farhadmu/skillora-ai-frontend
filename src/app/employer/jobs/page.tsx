@@ -17,38 +17,8 @@ import {
 import { api } from '@/lib/api';
 
 export default function EmployerJobsPage() {
-  const [jobs, setJobs] = useState([
-    {
-      id: 'job-1',
-      title: 'Senior Full-Stack AI Systems Engineer',
-      department: 'AI Engineering Core',
-      salary: '$130,000 - $160,000 USD',
-      applicantsCount: 18,
-      shortlistedCount: 4,
-      status: 'PUBLISHED',
-      skills: ['TypeScript', 'NestJS', 'React', 'Docker', 'RAG'],
-    },
-    {
-      id: 'job-2',
-      title: 'Backend Node.js & Distributed Systems Architect',
-      department: 'Platform Infrastructure',
-      salary: '$140,000 - $175,000 USD',
-      applicantsCount: 12,
-      shortlistedCount: 3,
-      status: 'PUBLISHED',
-      skills: ['Node.js', 'Redis', 'Docker', 'Microservices'],
-    },
-    {
-      id: 'job-3',
-      title: 'AI Applied Research & Inference Engineer',
-      department: 'Model Optimization',
-      salary: '$150,000 - $185,000 USD',
-      applicantsCount: 6,
-      shortlistedCount: 1,
-      status: 'DRAFT',
-      skills: ['Python', 'PyTorch', 'Quantization', 'Vector DB'],
-    },
-  ]);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -57,6 +27,23 @@ export default function EmployerJobsPage() {
   const [jdText, setJdText] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [extracting, setExtracting] = useState(false);
+  const [savingJob, setSavingJob] = useState(false);
+
+  React.useEffect(() => {
+    loadJobs();
+  }, []);
+
+  const loadJobs = async () => {
+    setLoading(true);
+    try {
+      const list = await api.getJobs();
+      setJobs(list && list.length > 0 ? list : []);
+    } catch (e) {
+      console.error('Failed to load jobs:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleExtractSkills = async () => {
     if (!jdText.trim()) return;
@@ -72,31 +59,47 @@ export default function EmployerJobsPage() {
     }
   };
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
-    const newJob = {
-      id: 'job-' + Date.now(),
-      title,
-      department: dept,
-      salary,
-      applicantsCount: 0,
-      shortlistedCount: 0,
-      status: 'DRAFT',
-      skills: skills.length > 0 ? skills : ['TypeScript', 'Node.js'],
-    };
-    setJobs([newJob, ...jobs]);
-    setTitle('');
-    setJdText('');
-    setSkills([]);
-    setModalOpen(false);
+    if (!title.trim() || savingJob) return;
+    setSavingJob(true);
+
+    try {
+      const created = await api.createJob({
+        title,
+        department: dept,
+        salaryRange: salary,
+        requiredSkills: skills.length > 0 ? skills : ['TypeScript', 'Node.js', 'React'],
+        preferredSkills: ['Docker', 'MongoDB'],
+        description: jdText || `Join our engineering team as ${title}.`,
+        mode: 'remote',
+        experienceLevel: 'Mid',
+        responsibilities: [
+          'Design and implement high-performance cloud services',
+          'Collaborate across cross-functional product and engineering teams',
+        ],
+        requirements: [
+          'Strong practical experience in relevant tech stacks',
+          'Commitment to software craftsmanship and verifiable tests',
+        ],
+      });
+      setJobs([created, ...jobs]);
+      setTitle('');
+      setJdText('');
+      setSkills([]);
+      setModalOpen(false);
+    } catch (err: any) {
+      console.error('Failed to create job:', err);
+    } finally {
+      setSavingJob(false);
+    }
   };
 
   const toggleStatus = (id: string) => {
     setJobs(
       jobs.map((j) =>
         j.id === id
-          ? { ...j, status: j.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED' }
+          ? { ...j, status: j.status === 'PUBLISHED' || j.status === 'published' ? 'DRAFT' : 'PUBLISHED' }
           : j,
       ),
     );
@@ -153,7 +156,7 @@ export default function EmployerJobsPage() {
               <div className="text-xs text-emerald-400 font-mono font-bold">{job.salary}</div>
 
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {job.skills.map((s) => (
+                {job.skills.map((s: string) => (
                   <span
                     key={s}
                     className="px-2 py-0.5 rounded bg-[#101726] border border-[#1e293b] text-zinc-300 text-[11px] font-mono"

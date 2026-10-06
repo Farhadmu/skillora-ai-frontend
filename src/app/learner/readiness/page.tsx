@@ -32,15 +32,16 @@ export default function LearnerReadinessPage() {
     });
   }, []);
 
-  const score = readiness?.overallScore || 84;
-  const dimensions = readiness?.dimensions || {
-    technical: 88,
-    problemSolving: 85,
-    projects: 86,
-    communication: 80,
-    interview: 82,
-    roleAlignment: 84,
-    practical: 81,
+  const hasCalculated = readiness?.overallScore != null || profile?.readinessScore != null;
+  const score = readiness?.overallScore ?? profile?.readinessScore ?? null;
+  const dimensions = readiness?.dimensions || profile?.readinessDimensions || {
+    technical: 0,
+    problemSolving: 0,
+    projects: 0,
+    communication: 0,
+    interview: 0,
+    roleAlignment: 0,
+    practical: 0,
   };
 
   return (
@@ -54,7 +55,7 @@ export default function LearnerReadinessPage() {
               <span>Workforce Intelligence Engine</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Verified Job Readiness Score: {score}/100
+              Verified Job Readiness Score: {score != null ? `${score}/100` : 'Pending Evaluation'}
             </h1>
             <p className="text-xs text-zinc-400 mt-0.5">
               Explainable multi-dimensional assessment evaluating your readiness for{' '}
