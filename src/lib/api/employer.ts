@@ -22,4 +22,31 @@ export const employerApi = {
       method: 'POST',
       body: JSON.stringify({ description }),
     }),
+
+  // Talent Search & Candidate Discovery (Workflow 2)
+  searchTalent: (params?: { query?: string; skill?: string; minReadiness?: number; targetRole?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.query) q.append('query', params.query);
+    if (params?.skill) q.append('skill', params.skill);
+    if (params?.minReadiness) q.append('minReadiness', params.minReadiness.toString());
+    if (params?.targetRole) q.append('targetRole', params.targetRole);
+    const queryString = q.toString();
+    return apiClient<any[]>(`/api/marketplace/talent/search${queryString ? `?${queryString}` : ''}`);
+  },
+
+  // Interview Management
+  scheduleInterview: (data: {
+    applicationId: string;
+    scheduledAt: string;
+    interviewType?: string;
+    durationMinutes?: number;
+    meetingLink?: string;
+    instructions?: string;
+  }) =>
+    apiClient<any>('/api/marketplace/interviews/schedule', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getEmployerInterviews: () => apiClient<any[]>('/api/marketplace/interviews'),
+  getLearnerInterviews: () => apiClient<any[]>('/api/marketplace/interviews/my'),
 };

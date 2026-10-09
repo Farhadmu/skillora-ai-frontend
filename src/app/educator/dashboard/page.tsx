@@ -24,9 +24,11 @@ import {
 } from 'lucide-react';
 import { api, getCurrentUser } from '@/lib/api';
 import { apiClient } from '@/lib/api/client';
+import { educatorApi } from '@/lib/api/educator';
 
 export default function EducatorPage() {
   const [cohortData, setCohortData] = useState<any>(null);
+  const [marketDemand, setMarketDemand] = useState<any>(null);
 
   // Modal States
   const [quizModalOpen, setQuizModalOpen] = useState(false);
@@ -65,6 +67,13 @@ export default function EducatorPage() {
       setCohortData(data);
     } catch (err) {
       console.error('Failed to load cohort data:', err);
+    }
+
+    try {
+      const demand = await educatorApi.getMarketDemand();
+      setMarketDemand(demand);
+    } catch (err) {
+      console.error('Failed to load market demand:', err);
     }
   };
 
@@ -313,6 +322,65 @@ export default function EducatorPage() {
                 ))}
               </div>
             </div>
+
+            {/* Workflow 3: Employer Skill Demand & Curriculum Alignment */}
+            {marketDemand && (
+              <div className="p-6 rounded-2xl bg-[#0b0f19] border border-cyan-500/30 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-cyan-400" />
+                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                        Real Employer Skill Demand Telemetry (Workflow 3)
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 text-[10px] font-mono">
+                        {marketDemand.totalJobsAnalyzed} Jobs Indexed
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-400 mt-1">
+                      Aggregated demand data directly from active employer job requisitions. Align syllabi and coursework with industry shortages.
+                    </p>
+                  </div>
+                  <Link
+                    href="/educator/content"
+                    className="px-3.5 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 font-bold text-xs font-mono transition"
+                  >
+                    Adjust Coursework
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                  {(marketDemand.topSkillsDemand || []).slice(0, 8).map((item: any, idx: number) => (
+                    <div key={idx} className="p-3.5 rounded-xl bg-[#0e1424] border border-[#161f33] space-y-1">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-white font-mono">{item.skill}</span>
+                        <span className="text-[10px] font-mono text-cyan-400 font-bold">{item.count} Openings</span>
+                      </div>
+                      <div className="w-full h-1 bg-[#141b2a] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-cyan-400 rounded-full"
+                          style={{ width: `${Math.min(item.percentage, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-zinc-500 font-mono">In {item.percentage}% of employer posts</div>
+                    </div>
+                  ))}
+                </div>
+
+                {marketDemand.curriculumRecommendations?.length > 0 && (
+                  <div className="p-4 rounded-xl bg-[#0a101d] border border-cyan-500/20 text-xs text-zinc-300 space-y-1.5 mt-2">
+                    <span className="font-bold text-cyan-300 uppercase tracking-wide text-[10px] font-mono block">
+                      Curriculum Alignment Recommendations:
+                    </span>
+                    <ul className="list-disc pl-4 space-y-1 text-zinc-400 text-[11px]">
+                      {marketDemand.curriculumRecommendations.map((rec: string, i: number) => (
+                        <li key={i}>{rec}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
