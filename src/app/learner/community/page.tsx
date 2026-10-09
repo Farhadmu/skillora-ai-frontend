@@ -17,7 +17,7 @@ import {
   Bot,
   ExternalLink,
 } from 'lucide-react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+
 
 export default function LearnerCommunityPage() {
   const [activeTab, setActiveTab] = useState<'discussions' | 'pods' | 'hackathons' | 'mentors'>('discussions');
@@ -110,7 +110,7 @@ export default function LearnerCommunityPage() {
   ];
 
   return (
-    <DashboardLayout role="LEARNER">
+    <div className="select-none">
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#1a2236]">
@@ -304,6 +304,6 @@ export default function LearnerCommunityPage() {
           </div>
         )}
       </main>
-    </DashboardLayout>
+    </div>
   );
 }

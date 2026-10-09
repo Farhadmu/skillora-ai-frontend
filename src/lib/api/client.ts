@@ -55,12 +55,20 @@ export function setAuthSession(
 
   if (accessToken && accessToken !== 'undefined' && accessToken !== 'null') {
     localStorage.setItem('skillora_access_token', accessToken);
+    try {
+      document.cookie = `skillora_access_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+    } catch {}
   }
   if (refreshToken && refreshToken !== 'undefined' && refreshToken !== 'null') {
     localStorage.setItem('skillora_refresh_token', refreshToken);
   }
   if (user) {
     localStorage.setItem('skillora_user', JSON.stringify(user));
+    if (user.role) {
+      try {
+        document.cookie = `skillora_role=${user.role}; path=/; max-age=604800; SameSite=Lax`;
+      } catch {}
+    }
   }
 }
 
@@ -69,6 +77,10 @@ export function clearAuthSession() {
   localStorage.removeItem('skillora_access_token');
   localStorage.removeItem('skillora_refresh_token');
   localStorage.removeItem('skillora_user');
+  try {
+    document.cookie = 'skillora_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'skillora_access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+  } catch {}
 }
 
 export function getCurrentUser(): any {

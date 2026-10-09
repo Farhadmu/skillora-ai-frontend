@@ -68,12 +68,12 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const defaultActions = [
     { title: 'Learner Command Center', icon: Layers, path: '/learner/dashboard', desc: 'Readiness scores, today mission, and metrics' },
     { title: 'AI Career Intelligence', icon: Compass, path: '/learner/career', desc: 'Target role comparison & JD Intelligence' },
-    { title: 'Learning Center & Modules', icon: Bot, path: '/learner/learn', desc: 'Knowledge hub, active lessons & flashcards' },
-    { title: 'Socratic AI Teacher', icon: Bot, path: '/learner/ai-teacher', desc: 'First-principles dialogue & concept mastery' },
+    { title: 'Learning Center & Modules', icon: Bot, path: '/learner/learning', desc: 'Knowledge hub, active lessons & flashcards' },
+    { title: 'Socratic AI Teacher', icon: Bot, path: '/learner/learning/ai-teacher', desc: 'First-principles dialogue & concept mastery' },
     { title: 'Visual Skill Graph & Gaps', icon: Cpu, path: '/learner/skills', desc: 'Visual ontology & prerequisite maps' },
-    { title: 'Adaptive Assessments', icon: ShieldCheck, path: '/learner/assessments', desc: 'Technical exams, MCQ, and certifications' },
-    { title: 'Projects Workspace & Review', icon: Code2, path: '/learner/projects', desc: 'Automated AI code review & refactoring' },
-    { title: 'Interactive Coding Lab', icon: Code2, path: '/learner/coding', desc: 'In-browser challenges & sandbox test suite' },
+    { title: 'Adaptive Assessments', icon: ShieldCheck, path: '/learner/skills/assessment', desc: 'Technical exams, MCQ, and certifications' },
+    { title: 'Projects Workspace & Review', icon: Code2, path: '/learner/build/projects', desc: 'Automated AI code review & refactoring' },
+    { title: 'Interactive Coding Lab', icon: Code2, path: '/learner/build/coding', desc: 'In-browser challenges & sandbox test suite' },
     { title: 'AI Mock Interview', icon: ShieldCheck, path: '/learner/interview', desc: 'Simulated technical & system design' },
     { title: 'Workforce Readiness Audit', icon: ShieldCheck, path: '/learner/readiness', desc: '7-D explainable readiness score breakdown' },
     { title: 'Talent Marketplace & Matching', icon: Briefcase, path: '/learner/jobs', desc: 'AI-matched verified job opportunities' },
@@ -134,7 +134,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   {results.skills.map((s: any) => (
                     <button
                       key={s.id}
-                      onClick={() => handleSelect('/skills')}
+                      onClick={() => handleSelect('/learner/skills')}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between hover:bg-[#161f33] transition"
                     >
                       <div>
@@ -155,7 +155,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   {results.jobs.map((j: any) => (
                     <button
                       key={j.id}
-                      onClick={() => handleSelect('/jobs')}
+                      onClick={() => handleSelect('/learner/jobs')}
                       className="w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between hover:bg-[#161f33] transition"
                     >
                       <div>

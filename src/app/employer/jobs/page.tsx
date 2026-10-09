@@ -50,10 +50,12 @@ export default function EmployerJobsPage() {
     setExtracting(true);
     try {
       const res = await api.analyzeJd(jdText);
-      const extracted = res?.extractedSkills || ['TypeScript', 'NestJS', 'Vector RAG', 'Docker'];
-      setSkills(Array.from(new Set([...skills, ...extracted])));
+      const extracted = res?.extractedSkills || [];
+      if (extracted.length > 0) {
+        setSkills(Array.from(new Set([...skills, ...extracted])));
+      }
     } catch (e) {
-      setSkills(['TypeScript', 'NestJS', 'Vector RAG', 'Docker']);
+      console.error('Failed to extract skills:', e);
     } finally {
       setExtracting(false);
     }
@@ -69,8 +71,8 @@ export default function EmployerJobsPage() {
         title,
         department: dept,
         salaryRange: salary,
-        requiredSkills: skills.length > 0 ? skills : ['TypeScript', 'Node.js', 'React'],
-        preferredSkills: ['Docker', 'MongoDB'],
+        requiredSkills: skills,
+        preferredSkills: [],
         description: jdText || `Join our engineering team as ${title}.`,
         mode: 'remote',
         experienceLevel: 'Mid',

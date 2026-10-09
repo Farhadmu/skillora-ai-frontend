@@ -186,42 +186,36 @@ Full-Stack Developer | InnovateTech (2023 - Present)
                 {/* Extracted Skills Badges */}
                 <div className="p-6 rounded-2xl bg-[#0b0f19] border border-[#1e293b] space-y-4">
                   <h3 className="text-sm font-bold text-white">Extracted Skills Mapped to Workforce Taxonomy</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {(result.extracted?.extractedSkills || [
-                      'TypeScript',
-                      'NestJS',
-                      'Next.js',
-                      'React 19',
-                      'Gemini AI',
-                      'RAG',
-                      'MongoDB',
-                      'Qdrant',
-                      'Docker',
-                      'PostgreSQL',
-                    ]).map((s: string) => (
-                      <span
-                        key={s}
-                        className="px-3 py-1.5 rounded-xl bg-[#111726] border border-[#1e293b] text-xs font-semibold text-white flex items-center gap-1.5"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{s}</span>
-                      </span>
-                    ))}
-                  </div>
+                  {result.extracted?.extractedSkills && result.extracted.extractedSkills.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {result.extracted.extractedSkills.map((s: string) => (
+                        <span
+                          key={s}
+                          className="px-3 py-1.5 rounded-xl bg-[#111726] border border-[#1e293b] text-xs font-semibold text-white flex items-center gap-1.5"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{s}</span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-zinc-500">No specific skills identified in the provided text.</p>
+                  )}
                 </div>
 
                 {/* AI Recommendations */}
                 <div className="p-6 rounded-2xl bg-[#0b0f19] border border-[#1e293b] space-y-3">
                   <h3 className="text-sm font-bold text-white">AI Recommendations to Elevate Employability</h3>
                   <ul className="space-y-2 text-xs text-zinc-300">
-                    <li className="flex items-start gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span>Quantify the impact of the multi-tenant API gateway with metrics (e.g. requests/sec, latency reduction).</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span>Take the verified System Design assessment to convert your self-reported architecture claim into an employer-backed badge.</span>
-                    </li>
+                    {(result.extracted?.recommendations || [
+                      'Ensure your resume lists specific technologies and frameworks in your work and project history.',
+                      'Take in-platform skill assessments to convert self-reported claims into verified employer evidence.',
+                    ]).map((rec: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-emerald-400 font-bold">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

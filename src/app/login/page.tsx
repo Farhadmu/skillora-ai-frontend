@@ -19,8 +19,8 @@ import { api, setAuthSession } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('learner@skillora.ai');
-  const [password, setPassword] = useState('Password123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,11 +44,6 @@ export default function LoginPage() {
     }
   };
 
-  const quickDemoSelect = (roleEmail: string) => {
-    setEmail(roleEmail);
-    setPassword('Password123!');
-  };
-
   return (
     <div className="min-h-screen bg-[#06080d] text-zinc-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden bg-grid-pattern">
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
@@ -63,82 +58,11 @@ export default function LoginPage() {
           <span className="font-extrabold text-2xl tracking-wider text-white">SKILLORA AI</span>
         </Link>
         <h2 className="text-xl font-bold text-white tracking-tight">Sign In to Platform Workspace</h2>
-        <p className="text-xs text-zinc-400 mt-1">Select a verified demo persona or enter your credentials</p>
+        <p className="text-xs text-zinc-400 mt-1">Enter your verified email and password credentials</p>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="glass-panel p-8 rounded-2xl border border-[#1e293b] shadow-2xl space-y-6">
-          {/* Quick Demo Persona Switcher */}
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-2">
-              1-Click Demo Persona Quick-Fill
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => quickDemoSelect('learner@skillora.ai')}
-                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
-                  email === 'learner@skillora.ai'
-                    ? 'bg-emerald-500/15 border-emerald-500 text-emerald-400'
-                    : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
-                }`}
-              >
-                <Bot className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <div className="font-bold">Learner</div>
-                  <div className="text-[10px] text-zinc-500">Farhadul</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickDemoSelect('educator@skillora.ai')}
-                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
-                  email === 'educator@skillora.ai'
-                    ? 'bg-cyan-500/15 border-cyan-500 text-cyan-400'
-                    : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
-                }`}
-              >
-                <GraduationCap className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                <div>
-                  <div className="font-bold">Educator</div>
-                  <div className="text-[10px] text-zinc-500">Prof. Mitchell</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickDemoSelect('employer@skillora.ai')}
-                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
-                  email === 'employer@skillora.ai'
-                    ? 'bg-purple-500/15 border-purple-500 text-purple-400'
-                    : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
-                }`}
-              >
-                <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                <div>
-                  <div className="font-bold">Employer</div>
-                  <div className="text-[10px] text-zinc-500">TechScale AI</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickDemoSelect('admin@skillora.ai')}
-                className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition ${
-                  email === 'admin@skillora.ai'
-                    ? 'bg-emerald-500/15 border-emerald-500 text-emerald-400'
-                    : 'bg-[#0f1422] border-[#1c263c] text-zinc-300 hover:bg-[#151c30]'
-                }`}
-              >
-                <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <div>
-                  <div className="font-bold">SuperAdmin</div>
-                  <div className="text-[10px] text-zinc-500">Governance</div>
-                </div>
-              </button>
-            </div>
-          </div>
 
           {error && (
             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">

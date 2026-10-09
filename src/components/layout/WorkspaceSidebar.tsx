@@ -4,66 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Layers,
+  ChevronDown,
+  LogOut,
+  X,
   Sparkles,
-  Compass,
-  BookOpen,
-  Cpu,
-  Award,
-  Code2,
-  ShieldCheck,
-  Briefcase,
-  User,
-  BarChart3,
-  Terminal,
-  Users,
-  Settings,
   GraduationCap,
   Building2,
   ShieldAlert,
-  Server,
-  Database,
-  UserCheck,
-  Play,
-  TrendingUp,
-  Map,
-  Send,
-  ChevronDown,
-  ChevronRight,
-  LogOut,
-  X,
-  Bot,
-  Brain,
-  Search,
-  CheckCircle2,
-  FileCode,
-  FolderGit2,
-  GitPullRequest,
-  Bookmark,
-  FileText,
-  Target,
-  MessageSquare,
-  CreditCard,
-  Sliders,
-  Filter,
 } from 'lucide-react';
 import { useWorkspace, WorkspaceRole } from './WorkspaceContext';
 import { getCurrentUser, clearAuthSession } from '@/lib/api';
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
-  badgeColor?: string;
-}
-
-interface NavGroup {
-  title: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  items: NavItem[];
-  defaultOpen?: boolean;
-}
+import { getNavigationForRole, NavGroup, NavItem } from '@/config/navigation';
 
 export function WorkspaceSidebar() {
   const pathname = usePathname();
@@ -82,219 +33,27 @@ export function WorkspaceSidebar() {
     setUser(getCurrentUser());
   }, [pathname]);
 
-  // LEARNER GROUPS
-  const learnerGroups: NavGroup[] = [
-    {
-      title: 'Overview',
-      defaultOpen: true,
-      items: [
-        { label: 'Command Center', href: '/learner/dashboard', icon: Layers },
-        { label: '7-D Readiness Score', href: '/learner/readiness', icon: TrendingUp, badge: '84/100', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-      ],
-    },
-    {
-      title: 'Career',
-      items: [
-        { label: 'Career Overview', href: '/learner/career', icon: Compass },
-        { label: 'Career Explorer', href: '/learner/career/explorer', icon: Search },
-        { label: 'Target Career', href: '/learner/career/target', icon: Target },
-        { label: 'Alternative Paths', href: '/learner/career/paths', icon: Map },
-        { label: 'Skill Gap Analysis', href: '/learner/career/skill-gap', icon: Sparkles, badge: 'AI', badgeColor: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30' },
-        { label: 'Recommendations', href: '/learner/career/recommendations', icon: CheckCircle2 },
-      ],
-    },
-    {
-      title: 'Learning',
-      items: [
-        { label: 'My Learning', href: '/learner/learning', icon: BookOpen },
-        { label: 'AI Teacher', href: '/learner/learning/ai-teacher', icon: Bot, badge: 'Socratic', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        { label: 'Personalized Roadmap', href: '/learner/learning/roadmap', icon: Map },
-        { label: 'Courses', href: '/learner/learning/courses', icon: GraduationCap },
-        { label: 'Resources & Docs', href: '/learner/learning/resources', icon: FileText },
-        { label: 'Saved & Notes', href: '/learner/learning/notes', icon: Bookmark },
-      ],
-    },
-    {
-      title: 'Skills',
-      items: [
-        { label: 'Skills Directory', href: '/learner/skills', icon: Cpu },
-        { label: 'Skill Graph Engine', href: '/learner/skills/graph', icon: Layers, badge: 'Neural', badgeColor: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30' },
-        { label: 'Skill Assessments', href: '/learner/skills/assessment', icon: Award },
-        { label: 'Evidence Dossier', href: '/learner/skills/evidence', icon: ShieldCheck },
-        { label: 'Growth & Progress', href: '/learner/skills/progress', icon: TrendingUp },
-      ],
-    },
-    {
-      title: 'Assessments',
-      items: [
-        { label: 'Testing Center', href: '/learner/assessments', icon: Award, badge: 'Adaptive', badgeColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-      ],
-    },
-    {
-      title: 'Build',
-      items: [
-        { label: 'Build Hub', href: '/learner/build', icon: Code2 },
-        { label: 'Active Projects', href: '/learner/build/projects', icon: FileCode },
-        { label: 'Recommended Projects', href: '/learner/build/projects/recommended', icon: Sparkles },
-        { label: 'Coding Lab', href: '/learner/build/coding', icon: Terminal },
-        { label: 'AI Code Review', href: '/learner/build/code-review', icon: GitPullRequest, badge: 'Audit', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        { label: 'GitHub Sync', href: '/learner/build/github', icon: FolderGit2 },
-      ],
-    },
-    {
-      title: 'Interview',
-      items: [
-        { label: 'AI Mock Interview', href: '/learner/interview', icon: ShieldCheck, badge: 'Live', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-      ],
-    },
-    {
-      title: 'Jobs',
-      items: [
-        { label: 'Marketplace', href: '/learner/jobs', icon: Briefcase },
-        { label: 'Job Search', href: '/learner/jobs/search', icon: Search },
-        { label: 'AI Recommended', href: '/learner/jobs/recommended', icon: Sparkles },
-        { label: 'Skill Matches', href: '/learner/jobs/matches', icon: Target, badge: '94%', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        { label: 'Saved Jobs', href: '/learner/jobs/saved', icon: Bookmark },
-        { label: 'Applications', href: '/learner/jobs/applications', icon: CheckCircle2 },
-      ],
-    },
-    {
-      title: 'Telemetry & Profile',
-      items: [
-        { label: 'Analytics & Telemetry', href: '/learner/analytics', icon: BarChart3 },
-        { label: 'Achievements & Badges', href: '/learner/achievements', icon: Award },
-        { label: 'Peer Community', href: '/learner/community', icon: Users },
-        { label: 'Public Portfolio', href: '/learner/portfolio', icon: User },
-        { label: 'Settings & Security', href: '/learner/settings', icon: Settings },
-      ],
-    },
-  ];
-
-  // EDUCATOR GROUPS
-  const educatorGroups: NavGroup[] = [
-    {
-      title: 'Operations',
-      defaultOpen: true,
-      items: [
-        { label: 'Overview Console', href: '/educator/dashboard', icon: GraduationCap },
-        { label: 'Curriculum & Teaching', href: '/educator/teaching', icon: BookOpen },
-        { label: 'Learners Roster', href: '/educator/learners', icon: Users },
-      ],
-    },
-    {
-      title: 'Evaluation & AI',
-      defaultOpen: true,
-      items: [
-        { label: 'Assessments Studio', href: '/educator/assessments', icon: Award },
-        { label: 'AI Teaching Assistant', href: '/educator/ai', icon: Brain, badge: 'Copilot', badgeColor: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30' },
-        { label: 'Cohort Analytics', href: '/educator/analytics', icon: BarChart3 },
-      ],
-    },
-    {
-      title: 'Management',
-      items: [
-        { label: 'Content Library', href: '/educator/content', icon: Layers },
-        { label: 'Cohort Management', href: '/educator/cohorts', icon: Users },
-        { label: 'Communication & Alerts', href: '/educator/communication', icon: Send },
-        { label: 'Educator Settings', href: '/educator/settings', icon: Settings },
-      ],
-    },
-  ];
-
-  // EMPLOYER GROUPS
-  const employerGroups: NavGroup[] = [
-    {
-      title: 'Talent Acquisition',
-      defaultOpen: true,
-      items: [
-        { label: 'ATS Overview', href: '/employer/dashboard', icon: Building2 },
-        { label: 'Company Profile', href: '/employer/company', icon: Building2 },
-        { label: 'Job Postings', href: '/employer/jobs', icon: Briefcase },
-        { label: 'Candidate Pipeline', href: '/employer/pipeline', icon: Layers },
-      ],
-    },
-    {
-      title: 'Intelligence & Hiring',
-      defaultOpen: true,
-      items: [
-        { label: 'Verified Talent Search', href: '/employer/talent', icon: Users },
-        { label: 'AI Matching Engine', href: '/employer/matching', icon: Sparkles, badge: 'Zero-Bias', badgeColor: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
-        { label: 'Shortlists', href: '/employer/shortlists', icon: Bookmark },
-        { label: 'Interview Management', href: '/employer/interviews', icon: Play },
-      ],
-    },
-    {
-      title: 'Operations',
-      items: [
-        { label: 'Hiring Analytics', href: '/employer/analytics', icon: BarChart3 },
-        { label: 'Candidate Messaging', href: '/employer/communication', icon: MessageSquare },
-        { label: 'Account & Compliance', href: '/employer/settings', icon: Settings },
-      ],
-    },
-  ];
-
-  // ADMIN GROUPS
-  const adminGroups: NavGroup[] = [
-    {
-      title: 'Governance',
-      defaultOpen: true,
-      items: [
-        { label: 'Governance Overview', href: '/admin/dashboard', icon: ShieldAlert },
-        { label: 'User Directory', href: '/admin/users', icon: Users },
-        { label: 'Roles & Permissions', href: '/admin/roles', icon: UserCheck },
-      ],
-    },
-    {
-      title: 'Workforce Registry',
-      items: [
-        { label: 'Learners Directory', href: '/admin/learners', icon: GraduationCap },
-        { label: 'Educators Directory', href: '/admin/educators', icon: BookOpen },
-        { label: 'Employers Directory', href: '/admin/employers', icon: Building2 },
-        { label: 'Jobs Moderation', href: '/admin/jobs', icon: Briefcase },
-        { label: 'Content Management', href: '/admin/content', icon: Layers },
-      ],
-    },
-    {
-      title: 'AI & Knowledge',
-      defaultOpen: true,
-      items: [
-        { label: 'Multi-Model AI Cascade', href: '/admin/ai', icon: Cpu, badge: '8 Nodes', badgeColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' },
-        { label: 'Vector Knowledge Base', href: '/admin/knowledge-base', icon: Database },
-        { label: 'Platform Telemetry', href: '/admin/analytics', icon: BarChart3 },
-      ],
-    },
-    {
-      title: 'Compliance & System',
-      items: [
-        { label: 'Content Moderation', href: '/admin/moderation', icon: ShieldCheck },
-        { label: 'Audit Logs & Ledger', href: '/admin/audit-logs', icon: FileText },
-        { label: 'Billing & Subscriptions', href: '/admin/billing', icon: CreditCard },
-        { label: 'System Configuration', href: '/admin/settings', icon: Sliders },
-      ],
-    },
-  ];
-
-  const roleGroupsMap: Record<WorkspaceRole, NavGroup[]> = {
-    LEARNER: learnerGroups,
-    EDUCATOR: educatorGroups,
-    EMPLOYER: employerGroups,
-    ADMIN: adminGroups,
-  };
-
-  const groups = roleGroupsMap[role] || learnerGroups;
+  const navConfig = getNavigationForRole(role);
+  const groups = navConfig.groups;
 
   // Auto-expand group containing current route
   useEffect(() => {
     groups.forEach((g) => {
-      const containsActive = g.items.some((item) => {
-        if (item.href === '/learner/dashboard') {
-          return pathname === '/learner/dashboard' || pathname === '/dashboard';
-        }
-        return pathname === item.href || (item.href !== '/learner/career' && item.href !== '/learner/skills' && item.href !== '/learner/build' && item.href !== '/learner/jobs' && pathname.startsWith(item.href + '/'));
-      });
+      const containsActive =
+        (g.sectionHref && (pathname === g.sectionHref || pathname.startsWith(g.sectionHref + '/'))) ||
+        g.items.some((item) => {
+          if (
+            item.href === '/learner/dashboard' ||
+            item.href === '/educator/dashboard' ||
+            item.href === '/employer/dashboard' ||
+            item.href === '/admin/dashboard'
+          ) {
+            return pathname === item.href;
+          }
+          return pathname === item.href || pathname.startsWith(item.href + '/');
+        });
+
       if (containsActive) {
-        setOpenGroups((prev) => ({ ...prev, [g.title]: true }));
-      } else if (g.defaultOpen && openGroups[g.title] === undefined) {
         setOpenGroups((prev) => ({ ...prev, [g.title]: true }));
       }
     });
@@ -308,19 +67,23 @@ export function WorkspaceSidebar() {
   };
 
   const isLinkActive = (href: string) => {
-    if (href === '/learner/dashboard') {
-      return pathname === '/learner/dashboard' || pathname === '/dashboard';
+    if (
+      href === '/learner/dashboard' ||
+      href === '/educator/dashboard' ||
+      href === '/employer/dashboard' ||
+      href === '/admin/dashboard'
+    ) {
+      return pathname === href;
     }
-    if (href === '/educator/dashboard') {
-      return pathname === '/educator/dashboard' || pathname === '/educator';
+    if (pathname === href) return true;
+    return pathname.startsWith(href + '/');
+  };
+
+  const isGroupActive = (group: NavGroup) => {
+    if (group.sectionHref && (pathname === group.sectionHref || pathname.startsWith(group.sectionHref + '/'))) {
+      return true;
     }
-    if (href === '/employer/dashboard') {
-      return pathname === '/employer/dashboard' || pathname === '/employer';
-    }
-    if (href === '/admin/dashboard') {
-      return pathname === '/admin/dashboard' || pathname === '/admin';
-    }
-    return pathname === href;
+    return group.items.some((item) => isLinkActive(item.href));
   };
 
   const handleLogout = () => {
@@ -407,21 +170,43 @@ export function WorkspaceSidebar() {
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 custom-scrollbar">
         {groups.map((group) => {
           const isOpen = openGroups[group.title] !== false;
+          const groupActive = isGroupActive(group);
 
           return (
             <div key={group.title} className="space-y-1">
               {!sidebarCollapsed ? (
-                <button
-                  onClick={() => toggleGroup(group.title)}
-                  className="w-full flex items-center justify-between px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-zinc-400 hover:text-zinc-200 transition group"
-                >
-                  <span>{group.title}</span>
-                  <ChevronDown
-                    className={`w-3 h-3 text-zinc-400 group-hover:text-zinc-300 transition-transform duration-150 ${
-                      isOpen ? 'rotate-0' : '-rotate-90'
-                    }`}
-                  />
-                </button>
+                <div className="flex items-center justify-between px-2 py-1">
+                  {group.sectionHref ? (
+                    <Link
+                      href={group.sectionHref}
+                      onClick={() => {
+                        if (mobileSidebarOpen) setMobileSidebarOpen(false);
+                      }}
+                      className={`text-[11px] font-bold uppercase tracking-wider transition ${
+                        groupActive ? 'text-emerald-400' : 'text-zinc-400 hover:text-zinc-200'
+                      }`}
+                    >
+                      {group.title}
+                    </Link>
+                  ) : (
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                      {group.title}
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.title)}
+                    className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-[#121a2c] transition"
+                    aria-label={`Toggle ${group.title} group`}
+                  >
+                    <ChevronDown
+                      className={`w-3 h-3 transition-transform duration-150 ${
+                        isOpen ? 'rotate-0' : '-rotate-90'
+                      }`}
+                    />
+                  </button>
+                </div>
               ) : (
                 <div className="h-px bg-[#151e30] my-2" />
               )}

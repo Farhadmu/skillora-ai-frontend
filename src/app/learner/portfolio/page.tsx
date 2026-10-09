@@ -17,7 +17,6 @@ import {
   Layers,
   ArrowRight,
 } from 'lucide-react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { api, getCurrentUser } from '@/lib/api';
 
 export default function LearnerPortfolioPage() {
@@ -51,7 +50,7 @@ export default function LearnerPortfolioPage() {
   };
 
   return (
-    <DashboardLayout role="LEARNER">
+    <div className="select-none">
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header with Share & Visibility Controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#1a2236]">
@@ -177,30 +176,38 @@ export default function LearnerPortfolioPage() {
               <span>Cryptographically Verified Skills & Evidence</span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {(profile?.skills || [
-                { name: 'TypeScript', proficiency: 90, verified: true, evidence: ['Assessment Score 92%'] },
-                { name: 'NestJS', proficiency: 86, verified: true, evidence: ['Repository review'] },
-                { name: 'React / Next.js', proficiency: 88, verified: true, evidence: ['Production App Router'] },
-                { name: 'RAG & Embeddings', proficiency: 84, verified: true, evidence: ['Vector Lab completed'] },
-                { name: 'MongoDB', proficiency: 82, verified: true, evidence: ['Indexing assessment'] },
-                { name: 'System Design', proficiency: 80, verified: true, evidence: ['Mock interview 82%'] },
-              ]).map((skill: any, idx: number) => (
-                <div key={idx} className="p-3.5 rounded-xl bg-[#111726] border border-[#1e293b] space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">{skill.name}</span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold">{skill.proficiency}%</span>
+            {profile?.skills && profile.skills.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {profile.skills.map((skill: any, idx: number) => (
+                  <div key={idx} className="p-3.5 rounded-xl bg-[#111726] border border-[#1e293b] space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white">{skill.name}</span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">{skill.proficiency}%</span>
+                    </div>
+                    <div className="w-full h-1 bg-[#161f33] rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${skill.proficiency}%` }} />
+                    </div>
+                    <div className="text-[10px] text-zinc-500 flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                      <span>{skill.evidence?.[0] || 'Verified via Skillora Engine'}</span>
+                    </div>
                   </div>
-                  <div className="w-full h-1 bg-[#161f33] rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${skill.proficiency}%` }} />
-                  </div>
-                  <div className="text-[10px] text-zinc-500 flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                    <span>{skill.evidence?.[0] || 'Verified via Skillora Engine'}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-6 rounded-xl bg-[#111726] border border-[#1e293b] text-center space-y-2">
+                <p className="text-xs text-zinc-400">
+                  No verified skills published on your portfolio yet.
+                </p>
+                <Link
+                  href="/learner/skills/assessment"
+                  className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-bold hover:underline"
+                >
+                  <span>Take a skill assessment to verify competencies</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Next Actions */}
@@ -209,7 +216,7 @@ export default function LearnerPortfolioPage() {
               Want to improve your public readiness score? Take a new assessment or complete a project milestone.
             </div>
             <Link
-              href="/learner/assessments"
+              href="/learner/skills/assessment"
               className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
             >
               <span>Explore Assessments</span>
@@ -218,6 +225,6 @@ export default function LearnerPortfolioPage() {
           </div>
         </div>
       </main>
-    </DashboardLayout>
+    </div>
   );
 }

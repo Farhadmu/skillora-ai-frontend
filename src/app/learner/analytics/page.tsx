@@ -28,7 +28,6 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { api } from '@/lib/api';
 
 const skillGrowthData = [
@@ -67,7 +66,7 @@ export default function LearnerAnalyticsPage() {
   }, []);
 
   return (
-    <DashboardLayout role="LEARNER">
+    <div className="select-none">
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#1a2236]">
@@ -272,6 +271,6 @@ export default function LearnerAnalyticsPage() {
           </div>
         </div>
       </main>
-    </DashboardLayout>
+    </div>
   );
 }

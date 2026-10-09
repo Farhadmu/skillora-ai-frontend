@@ -15,7 +15,6 @@ import {
   Info,
   HelpCircle,
 } from 'lucide-react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { api } from '@/lib/api';
 
 export default function LearnerReadinessPage() {
@@ -45,7 +44,7 @@ export default function LearnerReadinessPage() {
   };
 
   return (
-    <DashboardLayout role="LEARNER">
+    <div className="select-none">
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#1a2236]">
@@ -84,10 +83,19 @@ export default function LearnerReadinessPage() {
           </div>
 
           <p className="text-xs text-zinc-300 leading-relaxed max-w-3xl">
-            Your readiness score is synthesized across 7 objective pillars. You exhibit high technical rigor in{' '}
-            <strong className="text-white">TypeScript (90%)</strong>,{' '}
-            <strong className="text-white">NestJS (86%)</strong>, and{' '}
-            <strong className="text-white">RAG retrieval architectures (84%)</strong>, backed by verified code reviews and repository evidence. To push past 90/100, increase your distributed consensus knowledge and complete a simulated System Design mock interview.
+            {score && score > 0 ? (
+              <>
+                Your readiness score is synthesized across 7 objective workforce pillars.{' '}
+                {readiness?.strengths && readiness.strengths.length > 0
+                  ? readiness.strengths.join('. ') + '.'
+                  : `Currently tracking foundational evidence for ${profile?.targetRole || 'your target role'}.`}{' '}
+                {readiness?.recommendations && readiness.recommendations.length > 0
+                  ? `Next action: ${readiness.recommendations[0]}`
+                  : ''}
+              </>
+            ) : (
+              'No readiness evidence recorded yet. Complete diagnostic assessments, submit project repositories, and take mock interviews to generate your verified 7-dimension profile.'
+            )}
           </p>
         </div>
 
@@ -98,43 +106,64 @@ export default function LearnerReadinessPage() {
               name: 'Technical Skills Rigor',
               score: dimensions.technical,
               desc: 'Mastery across core language fundamentals, static typing, and backend framework conventions.',
-              evidence: 'Validated through 92% score on TypeScript Enterprise assessment.',
+              evidence:
+                dimensions.technical > 0
+                  ? `${profile?.skills?.filter((s: any) => s.verified)?.length || 0} verified skills with average proficiency ${dimensions.technical}%`
+                  : 'No assessments completed yet.',
             },
             {
               name: 'Applied Projects & Code',
               score: dimensions.projects,
               desc: 'Production readiness of public GitHub repositories, error handling, and container deployment.',
-              evidence: 'Verified RAG Knowledge Assistant codebase with zero OWASP flags.',
+              evidence:
+                dimensions.projects > 0
+                  ? 'Verified repository code reviews and project deliverables.'
+                  : 'No project submissions recorded yet.',
             },
             {
               name: 'Problem Solving & Algorithms',
               score: dimensions.problemSolving,
               desc: 'Algorithmic efficiency, time & space complexity, and concurrency handling.',
-              evidence: 'Passed asynchronous queue challenge with optimal O(1) scheduling.',
+              evidence:
+                dimensions.problemSolving > 0
+                  ? `Diagnostic score ${dimensions.problemSolving}% based on verified assessment attempts.`
+                  : 'Take a technical assessment to establish baseline.',
             },
             {
               name: 'Role Alignment to Market',
               score: dimensions.roleAlignment,
               desc: 'Overlap between your verified skills and current job postings from verified employers.',
-              evidence: '87% match with TechScale AI & QuantumData Labs requirements.',
+              evidence:
+                dimensions.roleAlignment > 0
+                  ? `${dimensions.roleAlignment}% overlap with ${profile?.targetRole || 'target role'} industry requirements.`
+                  : 'Select target role and add skills to measure alignment.',
             },
             {
               name: 'Mock Interview Performance',
               score: dimensions.interview,
               desc: 'First-principles reasoning, trade-off communication, and system design clarity.',
-              evidence: 'Scored 82% in Socratic System Design interview simulator.',
+              evidence:
+                dimensions.interview > 0
+                  ? `Scored ${dimensions.interview}% across simulated technical interview sessions.`
+                  : 'Complete an AI mock interview session.',
             },
             {
               name: 'Communication & Architecture',
               score: dimensions.communication,
               desc: 'Clarity in PR review feedback, architecture brief documentation, and explanations.',
-              evidence: 'AI evaluated peer code reviews and architectural explanations.',
+              evidence:
+                dimensions.communication > 0
+                  ? `Communication index ${dimensions.communication}% from interview trade-off evaluations.`
+                  : 'Pending evaluation from mock interview.',
             },
             {
               name: 'Production Practicality',
               score: dimensions.practical,
               desc: 'Real-world considerations including observability, logging, and rate limiting.',
-              evidence: 'Demonstrated in NestJS API Gateway implementation.',
+              evidence:
+                dimensions.practical > 0
+                  ? `Practical engineering score ${dimensions.practical}% from hands-on work.`
+                  : 'Pending code reviews or project submissions.',
             },
           ].map((dim, idx) => (
             <div
@@ -173,6 +202,6 @@ export default function LearnerReadinessPage() {
           </p>
         </div>
       </main>
-    </DashboardLayout>
+    </div>
   );
 }

@@ -195,7 +195,7 @@ export default function SkillGapPage() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-white">Extracted JD Competency Alignment</span>
               <span className="text-sm font-bold font-mono text-emerald-400">
-                {jdResult.matchScore || 88}% Match
+                {jdResult.matchScore != null ? `${jdResult.matchScore}% Match` : 'Alignment Calculated'}
               </span>
             </div>
 
@@ -203,28 +203,36 @@ export default function SkillGapPage() {
               <div>
                 <span className="text-zinc-500 font-semibold block mb-1">Matched Skills:</span>
                 <div className="flex flex-wrap gap-1">
-                  {(jdResult.matchedSkills || ['TypeScript', 'NestJS', 'Docker', 'RAG']).map((s: string) => (
-                    <span
-                      key={s}
-                      className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-mono"
-                    >
-                      ✓ {s}
-                    </span>
-                  ))}
+                  {(jdResult.matchedSkills || []).length > 0 ? (
+                    jdResult.matchedSkills.map((s: string) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-mono"
+                      >
+                        ✓ {s}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-zinc-500 text-[11px]">No verified skills match this job description yet.</span>
+                  )}
                 </div>
               </div>
 
               <div>
                 <span className="text-zinc-500 font-semibold block mb-1">Missing Skills to Acquire:</span>
                 <div className="flex flex-wrap gap-1">
-                  {(jdResult.missingSkills || ['Kubernetes', 'Redis Invalidation']).map((s: string) => (
-                    <span
-                      key={s}
-                      className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] font-mono"
-                    >
-                      ✗ {s}
-                    </span>
-                  ))}
+                  {(jdResult.missingSkills || []).length > 0 ? (
+                    jdResult.missingSkills.map((s: string) => (
+                      <span
+                        key={s}
+                        className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] font-mono"
+                      >
+                        ✗ {s}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-zinc-500 text-[11px]">No missing skills identified.</span>
+                  )}
                 </div>
               </div>
             </div>

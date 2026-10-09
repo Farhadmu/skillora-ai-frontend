@@ -23,7 +23,7 @@ import {
   PanelLeft,
 } from 'lucide-react';
 import { useWorkspace, WorkspaceRole } from './WorkspaceContext';
-import { getCurrentUser, clearAuthSession, switchWorkspaceRole } from '@/lib/api';
+import { getCurrentUser, clearAuthSession } from '@/lib/api';
 
 export function WorkspaceTopbar() {
   const pathname = usePathname();
@@ -57,10 +57,13 @@ export function WorkspaceTopbar() {
   // Build dynamic breadcrumbs from current pathname
   const generateBreadcrumbs = () => {
     const segments = pathname.split('/').filter(Boolean);
-    if (segments.length === 0) return [{ label: 'Overview', href: '/', isLast: true }];
+    if (segments.length === 0) return [{ label: 'Overview', href: `/${role.toLowerCase()}/dashboard`, isLast: true }];
 
     return segments.map((seg, idx) => {
-      const href = '/' + segments.slice(0, idx + 1).join('/');
+      let href = '/' + segments.slice(0, idx + 1).join('/');
+      if (idx === 0 && ['learner', 'educator', 'employer', 'admin'].includes(seg.toLowerCase())) {
+        href = `/${seg.toLowerCase()}/dashboard`;
+      }
       // Format human-readable label
       const label = seg
         .split('-')
@@ -71,6 +74,19 @@ export function WorkspaceTopbar() {
   };
 
   const breadcrumbs = generateBreadcrumbs();
+
+  const authorizedRoles: WorkspaceRole[] = React.useMemo(() => {
+    if (!user) return [];
+    if (user.role === 'ADMIN') {
+      return ['LEARNER', 'EDUCATOR', 'EMPLOYER', 'ADMIN'];
+    }
+    if (Array.isArray(user.roles) && user.roles.length > 1) {
+      return (user.roles as WorkspaceRole[]).filter((r) =>
+        ['LEARNER', 'EDUCATOR', 'EMPLOYER', 'ADMIN'].includes(r)
+      );
+    }
+    return [];
+  }, [user]);
 
   // Role-specific AI button configuration
   const aiButtonConfig: Record<
@@ -141,7 +157,7 @@ export function WorkspaceTopbar() {
         {/* Dynamic Breadcrumbs */}
         <nav className="flex items-center gap-1.5 text-xs text-zinc-400 min-w-0" aria-label="Breadcrumb">
           <Link
-            href="/"
+            href={`/${role.toLowerCase()}/dashboard`}
             className="font-bold text-white hover:text-emerald-400 transition flex items-center gap-1 shrink-0"
           >
             <span className="tracking-wider">SKILLORA</span>
@@ -250,16 +266,16 @@ export function WorkspaceTopbar() {
                 </Link>
 
                 <Link
-                  href="/learner/profile"
+                  href={role === 'LEARNER' ? '/learner/profile' : `/${role.toLowerCase()}/settings`}
                   onClick={() => setProfileDropdownOpen(false)}
                   className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-xl flex items-center gap-2.5 transition"
                 >
                   <User className="w-4 h-4 text-zinc-400" />
-                  <span>Profile Dossier</span>
+                  <span>{role === 'LEARNER' ? 'Profile Dossier' : 'Workspace Profile'}</span>
                 </Link>
 
                 <Link
-                  href="/learner/settings"
+                  href={`/${role.toLowerCase()}/settings`}
                   onClick={() => setProfileDropdownOpen(false)}
                   className="px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-[#161f33] rounded-xl flex items-center gap-2.5 transition"
                 >
@@ -268,73 +284,47 @@ export function WorkspaceTopbar() {
                 </Link>
               </div>
 
-              {/* 1-Click Role Switcher for Platform Evaluation */}
-              <div className="pt-2 pb-1 border-t border-[#1a2236]">
-                <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
-                  Switch Workspace
+              {/* Workspace Switcher (Restricted to Authorized Multi-Role Users & System Admin) */}
+              {authorizedRoles.length > 1 && (
+                <div className="pt-2 pb-1 border-t border-[#1a2236]">
+                  <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                    Switch Workspace
+                  </div>
+                  <div className="space-y-0.5 mt-1">
+                    {authorizedRoles.map((targetRole) => {
+                      const isActive = role === targetRole;
+                      const roleConfig: Record<
+                        WorkspaceRole,
+                        { label: string; activeStyle: string; badgeText: string }
+                      > = {
+                        LEARNER: { label: '🎓 Learner OS', activeStyle: 'bg-emerald-500/15 text-emerald-300 font-bold', badgeText: 'text-emerald-400' },
+                        EDUCATOR: { label: '🏫 Educator Console', activeStyle: 'bg-cyan-500/15 text-cyan-300 font-bold', badgeText: 'text-cyan-400' },
+                        EMPLOYER: { label: '🏢 Employer ATS', activeStyle: 'bg-purple-500/15 text-purple-300 font-bold', badgeText: 'text-purple-400' },
+                        ADMIN: { label: '🛡️ Admin Governance', activeStyle: 'bg-amber-500/15 text-amber-300 font-bold', badgeText: 'text-amber-400' },
+                      };
+                      const cfg = roleConfig[targetRole];
+
+                      return (
+                        <button
+                          key={targetRole}
+                          onClick={() => {
+                            setProfileDropdownOpen(false);
+                            router.push(`/${targetRole.toLowerCase()}/dashboard`);
+                          }}
+                          className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
+                            isActive
+                              ? cfg.activeStyle
+                              : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
+                          }`}
+                        >
+                          <span>{cfg.label}</span>
+                          {isActive && <span className={`text-[10px] ${cfg.badgeText}`}>Active</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="space-y-0.5 mt-1">
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      switchWorkspaceRole('LEARNER');
-                    }}
-                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
-                      role === 'LEARNER'
-                        ? 'bg-emerald-500/15 text-emerald-300 font-bold'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
-                    }`}
-                  >
-                    <span>🎓 Learner OS</span>
-                    {role === 'LEARNER' && <span className="text-[10px] text-emerald-400">Active</span>}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      switchWorkspaceRole('EDUCATOR');
-                    }}
-                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
-                      role === 'EDUCATOR'
-                        ? 'bg-cyan-500/15 text-cyan-300 font-bold'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
-                    }`}
-                  >
-                    <span>🏫 Educator Console</span>
-                    {role === 'EDUCATOR' && <span className="text-[10px] text-cyan-400">Active</span>}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      switchWorkspaceRole('EMPLOYER');
-                    }}
-                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
-                      role === 'EMPLOYER'
-                        ? 'bg-purple-500/15 text-purple-300 font-bold'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
-                    }`}
-                  >
-                    <span>🏢 Employer ATS</span>
-                    {role === 'EMPLOYER' && <span className="text-[10px] text-purple-400">Active</span>}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      switchWorkspaceRole('ADMIN');
-                    }}
-                    className={`w-full px-3 py-1.5 text-xs rounded-xl flex items-center justify-between transition ${
-                      role === 'ADMIN'
-                        ? 'bg-amber-500/15 text-amber-300 font-bold'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141b2c]'
-                    }`}
-                  >
-                    <span>🛡️ Admin Governance</span>
-                    {role === 'ADMIN' && <span className="text-[10px] text-amber-400">Active</span>}
-                  </button>
-                </div>
-              </div>
+              )}
 
               <div className="pt-1.5 border-t border-[#1a2236]">
                 <button

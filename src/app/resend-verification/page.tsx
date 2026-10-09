@@ -74,21 +74,6 @@ export default function ResendVerificationPage() {
               </div>
               <p className="text-zinc-300 leading-relaxed">{responseInfo.message}</p>
 
-              {responseInfo.verificationUrl && (
-                <div className="pt-2 border-t border-emerald-500/20">
-                  <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold mb-1">
-                    Simulated Email Inbox Link (Development/Demo)
-                  </div>
-                  <Link
-                    href={responseInfo.verificationUrl.replace('http://localhost:3000', '')}
-                    className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline"
-                  >
-                    <span>Click here to complete verification</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                </div>
-              )}
-
               {responseInfo.alreadyVerified && (
                 <div className="pt-2 border-t border-emerald-500/20">
                   <Link

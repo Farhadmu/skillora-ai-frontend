@@ -151,27 +151,9 @@ export default function RegisterPage() {
                 <h3 className="text-lg font-bold text-white">Account Created Successfully!</h3>
                 <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
                   We have dispatched a verification email to{' '}
-                  <span className="text-white font-semibold">{email}</span>. Click the verification link to activate all verified platform features.
+                  <span className="text-white font-semibold">{email}</span>. Please check your inbox and click the verification link to activate your account.
                 </p>
               </div>
-
-              {registrationResult.verificationUrl && (
-                <div className="p-4 rounded-xl bg-[#111726] border border-emerald-500/30 text-left space-y-2">
-                  <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
-                    Simulated Email Inbox Link (Development & Hackathon Demo)
-                  </div>
-                  <p className="text-xs text-zinc-300">
-                    In production, this link is delivered to your inbox. For testing, click below to verify immediately:
-                  </p>
-                  <Link
-                    href={registrationResult.verificationUrl.replace('http://localhost:3000', '')}
-                    className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-bold underline pt-1"
-                  >
-                    <span>Click here to verify email ({registrationResult.user?.role})</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              )}
 
               <div className="pt-2 flex flex-col gap-2">
                 <button

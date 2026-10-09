@@ -30,9 +30,9 @@ export default function EducatorAssessmentsPage() {
             id: a.id,
             title: a.title,
             difficulty: a.difficulty || 'Intermediate',
-            questionsCount: a.questionsCount || a.questions?.length || 5,
-            submissionsCount: Math.floor(Math.random() * 40) + 15,
-            avgScore: '84%',
+            questionsCount: a.questionsCount || a.questions?.length || 0,
+            submissionsCount: a.submissionsCount || 0,
+            avgScore: a.avgScore ? `${a.avgScore}%` : 'Pending',
             status: 'ACTIVE',
           })),
         );
@@ -50,13 +50,7 @@ export default function EducatorAssessmentsPage() {
     setGenerating(true);
     try {
       const res = await api.generateQuiz(topic, 4);
-      setGeneratedQuestions(res?.questions || [
-        {
-          question: `What is the primary architectural trade-off of ${topic}?`,
-          options: ['Zero network latency', 'Eventual consistency without distributed lock', 'Guaranteed synchronous ACK', 'Hardware isolation'],
-          answer: 1,
-        },
-      ]);
+      setGeneratedQuestions(res?.questions || []);
     } catch (e) {
       console.error(e);
     } finally {

@@ -71,25 +71,10 @@ export default function ForgotPasswordPage() {
                 <span>Instructions Dispatched</span>
               </div>
               <p className="text-zinc-300 leading-relaxed">{result.message}</p>
-
-              {result.resetUrl && (
-                <div className="pt-2 border-t border-emerald-500/20">
-                  <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold mb-1">
-                    Simulated Email Reset Link (Development/Demo)
-                  </div>
-                  <Link
-                    href={result.resetUrl.replace('http://localhost:3000', '')}
-                    className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline"
-                  >
-                    <span>Click here to set a new password</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                </div>
-              )}
             </div>
           )}
 
-          {!result?.resetUrl && (
+          {!result && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">

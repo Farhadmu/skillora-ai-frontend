@@ -17,4 +17,9 @@ export const employerApi = {
       method: 'POST',
       body: JSON.stringify({ targetRole }),
     }),
+  extractJobSkills: (description: string) =>
+    apiClient<any>('/api/marketplace/jobs/ai-extract', {
+      method: 'POST',
+      body: JSON.stringify({ description }),
+    }),
 };

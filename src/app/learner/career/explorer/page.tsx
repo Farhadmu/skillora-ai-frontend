@@ -130,7 +130,7 @@ export default function CareerExplorerPage() {
             <div className="space-y-2 pt-2 border-t border-[#151e30]">
               <span className="text-xs font-bold text-zinc-400 uppercase">Key Required Skills</span>
               <div className="flex flex-wrap gap-1.5">
-                {(comparison.roleA?.requiredSkills || ['TypeScript', 'Next.js', 'NestJS', 'RAG', 'Vector DB']).map((s: string) => (
+                {(comparison.roleA?.coreSkills || comparison.roleA?.requiredSkills || []).map((s: string) => (
                   <span
                     key={s}
                     className="px-2 py-0.5 rounded-md bg-[#101726] border border-[#1e293b] text-[11px] text-zinc-300 font-mono"
@@ -147,23 +147,22 @@ export default function CareerExplorerPage() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-purple-400 uppercase">Role B</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                {comparison.roleB?.growthOutlook || '+19% YoY Growth'}
+                {comparison.roleB?.growthOutlook || comparison.roleB?.marketGrowthRate || 'In Demand'}
               </span>
             </div>
             <h3 className="text-lg font-black text-white">{comparison.roleB?.title || roleB}</h3>
             <div className="text-sm font-bold text-emerald-400 flex items-center gap-1 font-mono">
               <DollarSign className="w-4 h-4" />
-              <span>{comparison.roleB?.averageSalary || '$155,000 / yr'}</span>
+              <span>{comparison.roleB?.averageSalary || comparison.roleB?.salaryRange || 'Competitive'}</span>
             </div>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              {comparison.roleB?.description ||
-                'Specializes in low-latency event-driven microservices, distributed data persistence, and cloud infrastructure.'}
+              {comparison.roleB?.description || ''}
             </p>
 
             <div className="space-y-2 pt-2 border-t border-[#151e30]">
               <span className="text-xs font-bold text-zinc-400 uppercase">Key Required Skills</span>
               <div className="flex flex-wrap gap-1.5">
-                {(comparison.roleB?.requiredSkills || ['Node.js', 'Kubernetes', 'Docker', 'PostgreSQL', 'Redis', 'Kafka']).map((s: string) => (
+                {(comparison.roleB?.coreSkills || comparison.roleB?.requiredSkills || []).map((s: string) => (
                   <span
                     key={s}
                     className="px-2 py-0.5 rounded-md bg-[#101726] border border-[#1e293b] text-[11px] text-zinc-300 font-mono"
